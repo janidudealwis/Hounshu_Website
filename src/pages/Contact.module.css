@@ -1,0 +1,384 @@
+.pageWrapper {
+  min-height: 100vh;
+  background: #070d07;
+  padding: 100px 0 150px 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.pageWrapper::before {
+  content: "";
+  position: absolute;
+  top: -200px;
+  left: -300px;
+  width: 800px;
+  height: 800px;
+  background: radial-gradient(
+    circle,
+    rgba(74, 222, 128, 0.1) 0%,
+    rgba(7, 13, 7, 0) 70%
+  );
+  filter: blur(90px);
+  z-index: 0;
+  pointer-events: none;
+}
+
+.glowTop,
+.glowMiddle,
+.glowBottom {
+  position: fixed;
+  pointer-events: none;
+}
+
+.glowTop {
+  top: -400px;
+  right: -200px;
+  width: 800px;
+  height: 800px;
+  background: radial-gradient(
+    circle,
+    rgba(74, 222, 128, 0.08),
+    transparent 70%
+  );
+  filter: blur(80px);
+  z-index: -1;
+}
+
+.glowMiddle {
+  top: 400px;
+  left: -400px;
+  width: 800px;
+  height: 800px;
+  background: radial-gradient(
+    circle,
+    rgba(74, 222, 128, 0.06),
+    transparent 70%
+  );
+  filter: blur(100px);
+  z-index: -1;
+}
+
+.glowBottom {
+  bottom: -500px;
+  right: -300px;
+  width: 1000px;
+  height: 1000px;
+  background: radial-gradient(
+    circle,
+    rgba(74, 222, 128, 0.05),
+    transparent 70%
+  );
+  filter: blur(120px);
+  z-index: -1;
+}
+
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 24px;
+  position: relative;
+  z-index: 1;
+}
+
+.heroSection {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  align-items: center;
+  min-height: 70vh;
+}
+
+.heroContent {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.heroTitle {
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 56px;
+  font-weight: 700;
+  line-height: 1.2;
+  color: #f0f4f0;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+.highlight {
+  color: #4ade80;
+}
+
+.heroDesc {
+  font-size: 16px;
+  color: #b0c4b0;
+  line-height: 1.7;
+  margin: 0;
+  max-width: 450px;
+}
+
+.contactInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.infoItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.infoIcon {
+  font-size: 28px;
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(74, 222, 128, 0.1);
+  border: 1px solid rgba(74, 222, 128, 0.2);
+  border-radius: 10px;
+}
+
+.infoContent {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.infoContent h4 {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #4ade80;
+  font-weight: 600;
+  margin: 0;
+}
+
+.infoContent p {
+  font-size: 14px;
+  color: #f0f4f0;
+  margin: 0;
+}
+
+/* Contact Form */
+.contactForm {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 28px;
+  background: rgba(17, 24, 17, 0.4);
+  border: 1px solid rgba(74, 222, 128, 0.15);
+  border-radius: 16px;
+  backdrop-filter: blur(8px);
+}
+
+.contactForm h2 {
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: #f0f4f0;
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+.formRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.formGroup label {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #b0c4b0;
+  font-weight: 600;
+}
+
+.formGroup input,
+.formGroup select,
+.formGroup textarea {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(74, 222, 128, 0.2);
+  border-radius: 10px;
+  padding: 10px 14px;
+  color: #f0f4f0;
+  font-family: "Inter", sans-serif;
+  font-size: 13px;
+  transition: all 0.3s ease;
+}
+
+.formGroup input::placeholder,
+.formGroup textarea::placeholder {
+  color: #5a7a5a;
+}
+
+.formGroup input:focus,
+.formGroup select:focus,
+.formGroup textarea:focus {
+  outline: none;
+  background: rgba(255, 255, 255, 0.06);
+  border-color: #4ade80;
+  box-shadow: 0 0 0 3px rgba(74, 222, 128, 0.1);
+}
+
+.formGroup input:disabled,
+.formGroup select:disabled,
+.formGroup textarea:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.formGroup select {
+  cursor: pointer;
+}
+
+.formGroup select option {
+  background: #070d07;
+  color: #f0f4f0;
+}
+
+.formGroup textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.submitBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: #22c55e;
+  color: #000;
+  border: none;
+  padding: 12px 28px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-top: 4px;
+}
+
+.submitBtn:hover:not(:disabled) {
+  background: #4ade80;
+  transform: translateX(4px);
+}
+
+.submitBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.arrow {
+  font-size: 18px;
+  transition: transform 0.3s ease;
+}
+
+.submitBtn:hover:not(:disabled) .arrow {
+  transform: translateX(4px);
+}
+
+footer {
+  margin-top: 80px;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .heroSection {
+    grid-template-columns: 1fr;
+    gap: 40px;
+    min-height: auto;
+  }
+
+  .heroTitle {
+    font-size: 48px;
+  }
+}
+
+@media (max-width: 768px) {
+  .pageWrapper {
+    padding: 80px 0 120px 0;
+  }
+
+  .container {
+    padding: 0 16px;
+  }
+
+  .heroTitle {
+    font-size: 36px;
+  }
+
+  .contactForm {
+    padding: 32px 20px;
+  }
+
+  .formRow {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .contactForm h2 {
+    font-size: 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  .pageWrapper {
+    padding: 60px 0 100px 0;
+  }
+
+  .container {
+    padding: 0 12px;
+  }
+
+  .heroSection {
+    gap: 32px;
+  }
+
+  .heroTitle {
+    font-size: 28px;
+  }
+
+  .heroDesc {
+    font-size: 14px;
+  }
+
+  .contactForm {
+    padding: 24px 16px;
+    gap: 16px;
+  }
+
+  .contactForm h2 {
+    font-size: 20px;
+  }
+
+  .infoItem {
+    gap: 12px;
+  }
+
+  .infoIcon {
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+  }
+
+  .infoContent p {
+    font-size: 13px;
+  }
+
+  .submitBtn {
+    padding: 12px 24px;
+    font-size: 12px;
+  }
+}

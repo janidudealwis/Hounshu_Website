@@ -1,0 +1,127 @@
+.section {
+  background: transparent;
+  padding: 100px 0 140px;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.innerContainer {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: start;
+  background: rgba(20, 35, 20, 0.25);
+  border: 1px solid rgba(74, 222, 128, 0.1);
+  border-radius: 24px;
+  padding: 60px;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.title {
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 40px;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  color: #f0f4f0;
+  margin: 0;
+}
+
+.description {
+  font-size: 15px;
+  color: #a0c4a0;
+  line-height: 1.7;
+  margin: 0;
+}
+
+.list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.list li {
+  font-size: 15px;
+  color: #f0f4f0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-left: 0;
+}
+
+.checkIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: 1.5px solid #22c55e;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.checkIcon svg {
+  width: 14px;
+  height: 14px;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.stat {
+  background: rgba(10, 20, 10, 0.4);
+  border: 1px solid rgba(74, 222, 128, 0.15);
+  border-radius: 16px;
+  padding: 32px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.statNumber {
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 42px;
+  font-weight: 700;
+  color: #4ade80;
+  margin-bottom: 8px;
+}
+
+.statLabel {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #7a9e7a;
+}
+
+@media (max-width: 1024px) {
+  .innerContainer {
+    grid-template-columns: 1fr;
+    gap: 60px;
+    padding: 40px;
+  }
+}
+
+@media (max-width: 600px) {
+  .innerContainer {
+    padding: 24px;
+  }
+  .stats {
+    grid-template-columns: 1fr;
+  }
+}
