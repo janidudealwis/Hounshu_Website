@@ -1,6 +1,6 @@
 import React from "react";
+import ScrollReveal from "./ScrollReveal";
 import styles from "./EquipmentCategories.module.css";
-import useScrollReveal from "../hooks/useScrollReveal";
 
 const categories = [
   {
@@ -94,46 +94,45 @@ const categories = [
 ];
 
 const EquipmentCategories = () => {
-  const headerRef = useScrollReveal();
-  const gridRef = useScrollReveal({ threshold: 0.08 });
-
   return (
     <section className={styles.section}>
       <div className={styles.container}>
-        <div ref={headerRef} className={`${styles.header} reveal`}>
-          <div>
-            <h2 className={styles.title}>Equipment Categories</h2>
-            <p className={styles.subtitle}>
-              High-performance machinery for diverse industrial needs
-            </p>
-          </div>
-          <a href="#" className={styles.viewAll}>
-            View All Categories &nbsp;→
-          </a>
-        </div>
-
-        <div
-          ref={gridRef}
-          className={`${styles.grid} reveal`}
-          style={{ transitionDelay: "0.15s" }}
-        >
-          {categories.map((cat) => (
-            <div key={cat.id} className={styles.card}>
-              <img
-                src={cat.img}
-                alt={cat.title}
-                className={styles.cardImg}
-                loading="lazy"
-              />
-              <div className={styles.cardOverlay} />
-              <div className={styles.cardContent}>
-                <span className={styles.cardIcon}>{cat.icon}</span>
-                <h3 className={styles.cardTitle}>{cat.title}</h3>
-                <p className={styles.cardDesc}>{cat.desc}</p>
-              </div>
+        <ScrollReveal direction="up" delay={0.2}>
+          <div className={styles.header}>
+            <div>
+              <h2 className={styles.title}>Equipment Categories</h2>
+              <p className={styles.subtitle}>
+                High-performance machinery for diverse industrial needs
+              </p>
             </div>
-          ))}
-        </div>
+            <a href="#" className={styles.viewAll}>
+              View All Categories &nbsp;→
+            </a>
+          </div>
+        </ScrollReveal>
+
+        <ScrollReveal direction="up" delay={0.4}>
+          <div className={styles.grid}>
+            {categories.map((cat, index) => (
+              <ScrollReveal key={cat.id} direction="up" delay={0.6 + index * 0.1}>
+                <div className={styles.card}>
+                  <img
+                    src={cat.img}
+                    alt={cat.title}
+                    className={styles.cardImg}
+                    loading="lazy"
+                  />
+                  <div className={styles.cardOverlay} />
+                  <div className={styles.cardContent}>
+                    <span className={styles.cardIcon}>{cat.icon}</span>
+                    <h3 className={styles.cardTitle}>{cat.title}</h3>
+                    <p className={styles.cardDesc}>{cat.desc}</p>
+                  </div>
+                </div>
+              </ScrollReveal>
+            ))}
+          </div>
+        </ScrollReveal>
       </div>
     </section>
   );

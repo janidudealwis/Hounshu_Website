@@ -1,6 +1,7 @@
 import React from "react";
+import { Link } from "react-router-dom";
+import ScrollReveal from "./ScrollReveal";
 import styles from "./Footer.module.css";
-import useScrollReveal from "../hooks/useScrollReveal";
 
 const quickLinks = [
   "Product Catalog",
@@ -16,12 +17,11 @@ const supportLinks = [
 ];
 
 const Footer = () => {
-  const topRef = useScrollReveal({ threshold: 0.05 });
-
   return (
     <footer className={styles.footer}>
-      <div className={styles.container}>
-        <div ref={topRef} className={`${styles.top} reveal`}>
+      <ScrollReveal direction="up" delay={0.2} threshold={0.05}>
+        <div className={styles.container}>
+          <div className={styles.top}>
           {/* Brand */}
           <div className={styles.brand}>
             <div className={styles.logo}>
@@ -118,17 +118,17 @@ const Footer = () => {
               <br />
               Sri Lanka
             </p>
-            <a href="tel:+94372224717" className={styles.phone}>
-              +94 37 22 24 717
-            </a>
-            <br />
-            <a href="mailto:honshu7@sltnet.lk" className={styles.phone}>
-              honshu7@sltnet.lk
-            </a>
-            <br />
-            <a href="mailto:honshu7@yahoo.com" className={styles.phone}>
-              honshu7@yahoo.com
-            </a>
+            <div className={styles.contactLinks}>
+              <a href="tel:+94372224717" className={styles.phone}>
+                +94 37 22 24 717
+              </a>
+              <a href="mailto:honshu7@sltnet.lk" className={styles.phone}>
+                honshu7@sltnet.lk
+              </a>
+              <a href="mailto:honshu7@yahoo.com" className={styles.phone}>
+                honshu7@yahoo.com
+              </a>
+            </div>
           </div>
         </div>
 
@@ -136,21 +136,37 @@ const Footer = () => {
           <p className={styles.copy}>
             ©2026 Honshu Enterprises Co., Ltd. All rights reserved.
           </p>
+          <p className={styles.designedBy}>
+            Designed and Developed by{" "}
+            <a
+              href="https://updayte.vercel.app/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <img
+                src="/logo-pill.png"
+                alt="Updayte"
+                style={{
+                  height: "20px",
+                  width: "auto",
+                  display: "inline",
+                  verticalAlign: "middle",
+                  marginLeft: "4px",
+                }}
+              />
+            </a>
+          </p>
           <div className={styles.legalLinks}>
             <a href="#">Privacy Policy</a>
             <a href="#">Terms of Use</a>
             <a href="#">Cookies</a>
+            <Link to="/admin/login">Admin</Link>
           </div>
         </div>
       </div>
-
-      <div className={styles.watermark}>
-        ALL RIGHTS RESERVED BY UPSITE. UNAUTHORIZED USE, REPRODUCTION, OR
-        DISTRIBUTION OF THIS DESIGN WITHOUT PRIOR PERMISSION IS STRICTLY
-        PROHIBITED AND MAY RESULT IN LEGAL ACTION.
-      </div>
-    </footer>
-  );
+    </ScrollReveal>
+  </footer>
+);
 };
 
 export default Footer;

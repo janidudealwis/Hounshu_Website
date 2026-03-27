@@ -3,10 +3,12 @@ import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import ScrollProgress from "../components/ScrollProgress";
+import ScrollReveal from "../components/ScrollReveal";
 import SuccessModal from "../components/SuccessModal";
 import { LenisProvider } from "../context/LenisContext";
 import { useCart } from "../context/CartContext";
 import { supabase } from "../lib/supabase";
+import { sanitizeInput, isValidPhone, isValidLength } from "../utils/security";
 import styles from "./Cart.module.css";
 
 const Cart = () => {
@@ -31,19 +33,23 @@ const Cart = () => {
   }, []);
 
   const handleCheckout = async () => {
-    // Validation
-    if (!customerName.trim()) {
-      alert("Please enter your name");
+    // Enhanced Validation
+    if (!isValidLength(customerName, 2, 100)) {
+      alert("Please enter a valid name (2-100 characters)");
       return;
     }
-    if (!phoneNumber.trim()) {
-      alert("Please enter your phone number");
+    if (!isValidPhone(phoneNumber)) {
+      alert("Please enter a valid phone number (10-15 digits)");
       return;
     }
 
     setIsLoading(true);
 
     try {
+      // Sanitize inputs
+      const sanitizedName = sanitizeInput(customerName.trim());
+      const sanitizedPhone = sanitizeInput(phoneNumber.trim());
+
       // Calculate totals
       const subtotal = getTotalPrice();
       const tax = subtotal * 0.1;
@@ -55,8 +61,8 @@ const Cart = () => {
         .from("orders")
         .insert([
           {
-            customer_name: customerName,
-            phone: phoneNumber,
+            customer_name: sanitizedName,
+            phone: sanitizedPhone,
             subtotal: subtotal,
             tax: Math.round(tax),
             total: Math.round(total),
@@ -67,13 +73,12 @@ const Cart = () => {
       if (orderError) throw new Error(orderError.message);
 
       const orderId = orderData[0].id;
-      console.log("Order created:", orderId);
 
       // 2. Insert order items into order_items table
       const orderItems = cartItems.map((item) => ({
         order_id: orderId,
         product_id: item.id,
-        product_name: item.name,
+        product_name: sanitizeInput(item.name),
         price: item.price,
         quantity: item.quantity,
       }));
@@ -84,11 +89,9 @@ const Cart = () => {
 
       if (itemsError) throw new Error(itemsError.message);
 
-      console.log("Order items inserted");
-
-      // 3. Generate WhatsApp message
+      // 3. Generate WhatsApp message with sanitized data
       const itemsList = cartItems
-        .map((item) => `• ${item.name} × ${item.quantity}`)
+        .map((item) => `• ${sanitizeInput(item.name)} × ${item.quantity}`)
         .join("\n");
 
       const message = `🧾 HONSHU ENTERPRISES QUOTE REQUEST
@@ -108,8 +111,12 @@ Total: $${Math.round(total).toLocaleString()}`;
       // 5. Clear cart after successful order
       clearCart();
 
-      // 6. Open WhatsApp
-      const whatsappURL = `https://wa.me/94701400093?text=${encodedMessage}`;
+      // 6. Get WhatsApp phone from environment variable
+      const whatsappPhone =
+        import.meta.env.VITE_WHATSAPP_PHONE || "94701400093";
+
+      // 7. Open WhatsApp
+      const whatsappURL = `https://wa.me/${whatsappPhone}?text=${encodedMessage}`;
       window.open(whatsappURL, "_blank");
 
       // Reset form
@@ -123,7 +130,6 @@ Total: $${Math.round(total).toLocaleString()}`;
       );
       setShowSuccessModal(true);
     } catch (error) {
-      console.error("Checkout error:", error);
       alert(`Error processing order: ${error.message}`);
     } finally {
       setIsLoading(false);
@@ -136,17 +142,30 @@ Total: $${Math.round(total).toLocaleString()}`;
         <ScrollProgress />
         <Navbar />
         <main className={styles.pageWrapper}>
-          <div className={styles.emptyCart}>
-            <div className={styles.emptyIcon}>🛒</div>
-            <h1>Your Cart is Empty</h1>
-            <p>Looks like you haven't added any products yet.</p>
-            <button
-              className={styles.continueBtn}
-              onClick={() => navigate("/products")}
-            >
-              Continue Shopping
-            </button>
-          </div>
+          <ScrollReveal direction="up" delay={0.2}>
+            <div className={styles.emptyCart}>
+              <ScrollReveal direction="scale" delay={0.4}>
+                <div className={styles.emptyIcon}>🛒</div>
+              </ScrollReveal>
+
+              <ScrollReveal direction="up" delay={0.6}>
+                <h1>Your Cart is Empty</h1>
+              </ScrollReveal>
+
+              <ScrollReveal direction="up" delay={0.8}>
+                <p>Looks like you haven't added any products yet.</p>
+              </ScrollReveal>
+
+              <ScrollReveal direction="up" delay={1.0}>
+                <button
+                  className={styles.continueBtn}
+                  onClick={() => navigate("/products")}
+                >
+                  Continue Shopping
+                </button>
+              </ScrollReveal>
+            </div>
+          </ScrollReveal>
         </main>
         <Footer />
       </LenisProvider>
@@ -165,14 +184,25 @@ Total: $${Math.round(total).toLocaleString()}`;
       <Navbar />
 
       <main className={styles.pageWrapper}>
-        <div className={styles.container}>
-          <h1 className={styles.pageTitle}>Shopping Cart</h1>
+        <ScrollReveal direction="fade" delay={0.2}>
+          <div className={styles.container}>
+            <ScrollReveal direction="up" delay={0.4}>
+              <h1 className={styles.pageTitle}>Shopping Cart</h1>
+            </ScrollReveal>
 
-          <div className={styles.cartLayout}>
-            {/* Cart Items */}
-            <div className={styles.cartItems}>
-              {cartItems.map((item) => (
-                <div key={item.id} className={styles.cartItem}>
+            <ScrollReveal direction="up" delay={0.6}>
+              <div className={styles.cartLayout}>
+                {/* Cart Items */}
+                <ScrollReveal direction="left" delay={0.8}>
+                  <div className={styles.cartItems}>
+                    {cartItems.map((item, index) => (
+                      <ScrollReveal
+                        key={item.id}
+                        direction="up"
+                        delay={1.0 + (index * 0.1)}
+                        duration={0.4}
+                      >
+                        <div className={styles.cartItem}>
                   <div className={styles.itemImage}>
                     <img src={item.image} alt={item.name} />
                   </div>
@@ -211,11 +241,14 @@ Total: $${Math.round(total).toLocaleString()}`;
                     ✕
                   </button>
                 </div>
-              ))}
-            </div>
+              </ScrollReveal>
+            ))}
+          </div>
+        </ScrollReveal>
 
-            {/* Order Summary */}
-            <div className={styles.orderSummary}>
+        {/* Order Summary */}
+        <ScrollReveal direction="right" delay={0.8}>
+              <div className={styles.orderSummary}>
               <h2 className={styles.summaryTitle}>Order Summary</h2>
 
               <div className={styles.summaryRow}>
@@ -261,6 +294,9 @@ Total: $${Math.round(total).toLocaleString()}`;
                     value={customerName}
                     onChange={(e) => setCustomerName(e.target.value)}
                     disabled={isLoading}
+                    required
+                    minLength={2}
+                    maxLength={100}
                   />
                   <input
                     type="tel"
@@ -268,6 +304,10 @@ Total: $${Math.round(total).toLocaleString()}`;
                     value={phoneNumber}
                     onChange={(e) => setPhoneNumber(e.target.value)}
                     disabled={isLoading}
+                    required
+                    minLength={10}
+                    maxLength={15}
+                    pattern="[0-9+\s\-\(\)]+"
                   />
                   <button
                     className={styles.submitBtn}
@@ -300,10 +340,13 @@ Total: $${Math.round(total).toLocaleString()}`;
               <button className={styles.clearCartBtn} onClick={clearCart}>
                 Clear Cart
               </button>
-            </div>
+              </div>
+            </ScrollReveal>
           </div>
+        </ScrollReveal>
         </div>
-      </main>
+      </ScrollReveal>
+    </main>
 
       <Footer />
       <SuccessModal

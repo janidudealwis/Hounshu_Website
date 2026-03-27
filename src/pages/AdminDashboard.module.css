@@ -1,0 +1,338 @@
+.wrapper {
+  min-height: 100vh;
+  background: #070d07;
+  padding: 80px 24px 60px;
+  position: relative;
+  overflow: hidden;
+}
+
+.wrapper::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -400px;
+  width: 800px;
+  height: 800px;
+  background: radial-gradient(
+    circle,
+    rgba(74, 222, 128, 0.08) 0%,
+    rgba(7, 13, 7, 0) 70%
+  );
+  filter: blur(90px);
+  z-index: 0;
+  pointer-events: none;
+}
+
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+
+.header {
+  background: rgba(17, 24, 17, 0.5);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(74, 222, 128, 0.12);
+  border-radius: 12px;
+  padding: 32px;
+  margin-bottom: 32px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.headerContent {
+  flex: 1;
+}
+
+.title {
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 32px;
+  font-weight: 700;
+  margin: 0 0 8px 0;
+  color: #f0f4f0;
+}
+
+.userInfo {
+  font-size: 14px;
+  color: #8a9e8a;
+  margin: 0;
+}
+
+.logoutBtn {
+  padding: 10px 24px;
+  background: transparent;
+  color: #f0f4f0;
+  border: 1px solid rgba(74, 222, 128, 0.3);
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s;
+  font-size: 14px;
+}
+
+.logoutBtn:hover {
+  background: rgba(74, 222, 128, 0.1);
+  border-color: #4ade80;
+  color: #4ade80;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(17, 24, 17, 0.5);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(74, 222, 128, 0.12);
+  padding: 24px;
+  border-radius: 12px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.controls h2 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: #f0f4f0;
+}
+
+.addBtn {
+  padding: 10px 24px;
+  background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
+  color: #070d07;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-size: 14px;
+}
+
+.addBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(74, 222, 128, 0.3);
+}
+
+.errorMsg {
+  background: rgba(239, 68, 68, 0.1);
+  color: #fca5a5;
+  padding: 16px;
+  border-radius: 8px;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  font-size: 14px;
+}
+
+.productsSection {
+  background: rgba(17, 24, 17, 0.5);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(74, 222, 128, 0.12);
+  border-radius: 12px;
+  padding: 24px;
+}
+
+.productsTitle {
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0 0 24px 0;
+  color: #4ade80;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.loading,
+.empty {
+  text-align: center;
+  padding: 60px 20px;
+  color: #8a9e8a;
+  font-size: 16px;
+}
+
+.productsList {
+  display: grid;
+  gap: 16px;
+}
+
+.productCard {
+  display: flex;
+  gap: 20px;
+  padding: 20px;
+  border: 1px solid rgba(74, 222, 128, 0.12);
+  border-radius: 8px;
+  background: rgba(10, 15, 10, 0.3);
+  transition: all 0.3s;
+  align-items: flex-start;
+}
+
+.productCard:hover {
+  border-color: rgba(74, 222, 128, 0.3);
+  background: rgba(10, 15, 10, 0.6);
+  box-shadow: 0 8px 16px rgba(74, 222, 128, 0.1);
+}
+
+.productImage {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 8px;
+  flex-shrink: 0;
+  border: 1px solid rgba(74, 222, 128, 0.12);
+}
+
+.productInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.productName {
+  margin: 0 0 6px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #f0f4f0;
+}
+
+.productBrand {
+  margin: 0 0 4px 0;
+  font-size: 13px;
+  color: #a0c4a0;
+  font-weight: 500;
+}
+
+.productSeries {
+  margin: 0 0 12px 0;
+  font-size: 12px;
+  color: #8a9e8a;
+}
+
+.productDetails {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.capacity,
+.fuelType,
+.status {
+  display: inline-block;
+  padding: 4px 12px;
+  background: rgba(74, 222, 128, 0.15);
+  color: #4ade80;
+  border: 1px solid rgba(74, 222, 128, 0.3);
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.fuelType {
+  background: rgba(139, 92, 246, 0.15);
+  color: #c4b5fd;
+  border-color: rgba(139, 92, 246, 0.3);
+}
+
+.status {
+  background: rgba(34, 197, 94, 0.15);
+  color: #22c55e;
+  border-color: rgba(34, 197, 94, 0.3);
+}
+
+.productMeta {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.price {
+  font-size: 16px;
+  font-weight: 700;
+  color: #4ade80;
+}
+
+.rating {
+  font-size: 13px;
+  color: #fbbf24;
+  font-weight: 600;
+}
+
+.buttonGroup {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.editBtn {
+  padding: 8px 16px;
+  background: rgba(74, 222, 128, 0.2);
+  color: #86efac;
+  border: 1px solid rgba(74, 222, 128, 0.3);
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s;
+  font-size: 13px;
+}
+
+.editBtn:hover {
+  background: rgba(74, 222, 128, 0.3);
+  border-color: rgba(74, 222, 128, 0.5);
+  transform: translateY(-1px);
+}
+
+.deleteBtn {
+  padding: 8px 16px;
+  background: rgba(239, 68, 68, 0.2);
+  color: #fca5a5;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s;
+  align-self: flex-start;
+  font-size: 13px;
+}
+
+.deleteBtn:hover {
+  background: rgba(239, 68, 68, 0.3);
+  border-color: rgba(239, 68, 68, 0.5);
+  transform: translateY(-1px);
+}
+
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    gap: 16px;
+    text-align: center;
+    align-items: flex-start;
+  }
+
+  .controls {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .productCard {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .productImage {
+    width: 100%;
+    max-width: 200px;
+    height: 200px;
+  }
+
+  .productMeta {
+    justify-content: center;
+  }
+}

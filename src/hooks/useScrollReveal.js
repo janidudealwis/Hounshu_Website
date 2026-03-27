@@ -1,34 +1,50 @@
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
+import { useInView } from "framer-motion";
 
 /**
- * Attaches an Intersection Observer to the returned ref.
- * When the element enters the viewport it gets the class `reveal-visible`,
- * triggering the CSS transition defined in index.css.
- *
- * @param {Object} options - IntersectionObserver options
+ * Enhanced scroll reveal hook using framer-motion for robust animations
+ * @param {Object} options - Configuration options
+ * @returns {Array} [ref, isInView] - Ref for the element and visibility state
  */
 const useScrollReveal = (options = {}) => {
+  const {
+    threshold = 0.1,
+    once = true,
+    margin = "0px 0px -50px 0px",
+  } = options;
+
   const ref = useRef(null);
+  const isInView = useInView(ref, {
+    threshold,
+    once,
+    margin,
+  });
 
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          el.classList.add("reveal-visible");
-          observer.unobserve(el); // animate once
-        }
-      },
-      { threshold: 0.12, ...options },
-    );
-
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
-
-  return ref;
+  return [ref, isInView];
 };
 
+/**
+ * Hook for creating staggered reveal animations
+ * @param {Object} options - Configuration options
+ * @returns {Array} [ref, isInView, getItemDelay] - Ref, visibility state, and delay function
+ */
+export const useStaggeredReveal = (options = {}) => {
+  const {
+    threshold = 0.1,
+    once = true,
+    margin = "0px 0px -50px 0px",
+    staggerDelay = 0.1,
+  } = options;
+
+  const ref = useRef(null);
+  const isInView = useInView(ref, {
+    threshold,
+    once,
+    margin,
+  });
+
+  const getItemDelay = (index) => index * staggerDelay;
+
+  return [ref, isInView, getItemDelay];
+};
 export default useScrollReveal;

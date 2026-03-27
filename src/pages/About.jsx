@@ -16,6 +16,7 @@ function About() {
     document.documentElement.scrollTop = 0;
     document.body.scrollTop = 0;
   }, []);
+
   return (
     <LenisProvider>
       <ScrollProgress />

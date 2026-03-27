@@ -5,7 +5,7 @@ import React, {
   useRef,
   useState,
 } from "react";
-import Lenis from "lenis";
+import Lenis from "@studio-freight/lenis";
 
 const LenisContext = createContext(null);
 

@@ -185,18 +185,73 @@
 }
 
 .dropdown {
-  background: rgba(20, 35, 20, 0.3);
+  background: linear-gradient(135deg, rgba(20, 35, 20, 0.4) 0%, rgba(15, 25, 15, 0.6) 100%);
   border: 1px solid rgba(74, 222, 128, 0.15);
-  border-radius: 8px;
-  padding: 10px 16px;
+  border-radius: 12px;
+  padding: 12px 18px;
   font-size: 14px;
-  color: #a0c4a0;
+  font-weight: 500;
+  color: #f0f4f0;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(74, 222, 128, 0.1);
+  backdrop-filter: blur(8px);
+  min-width: 160px;
+  position: relative;
+  overflow: hidden;
+}
+
+.dropdown::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(74, 222, 128, 0.1),
+    transparent
+  );
+  transition: left 0.5s ease;
 }
 
 .dropdown:hover {
-  border-color: rgba(74, 222, 128, 0.3);
+  border-color: rgba(74, 222, 128, 0.4);
+  background: linear-gradient(135deg, rgba(74, 222, 128, 0.1) 0%, rgba(20, 35, 20, 0.6) 100%);
+  box-shadow:
+    0 4px 12px rgba(74, 222, 128, 0.15),
+    inset 0 1px 0 rgba(74, 222, 128, 0.2);
+  transform: translateY(-1px);
+}
+
+.dropdown:hover::before {
+  left: 100%;
+}
+
+.dropdown:focus {
+  outline: none;
+  border-color: #4ade80;
+  box-shadow:
+    0 0 0 3px rgba(74, 222, 128, 0.2),
+    0 4px 12px rgba(74, 222, 128, 0.15),
+    inset 0 1px 0 rgba(74, 222, 128, 0.2);
+}
+
+.dropdown option {
+  background: #1a2e1a;
+  color: #f0f4f0;
+  padding: 8px 12px;
+  font-weight: 500;
+}
+
+.dropdown option:hover,
+.dropdown option:focus {
+  background: rgba(74, 222, 128, 0.2);
+  color: #4ade80;
 }
 
 .resultCount {
@@ -294,6 +349,7 @@
   line-height: 1.5;
   margin: 0;
   display: -webkit-box;
+  line-clamp: 2;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
@@ -430,6 +486,23 @@
 .paginationEllipsis {
   color: #7a9e7a;
   padding: 0 8px;
+}
+
+.loadingContainer,
+.emptyContainer {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 60px 40px;
+  border: 1px solid rgba(74, 222, 128, 0.12);
+  border-radius: 12px;
+  background: rgba(17, 24, 17, 0.3);
+}
+
+.loadingContainer p,
+.emptyContainer p {
+  color: #8a9e8a;
+  font-size: 16px;
+  margin: 0;
 }
 
 @media (max-width: 1024px) {

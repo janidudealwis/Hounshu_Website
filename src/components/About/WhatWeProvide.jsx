@@ -1,6 +1,6 @@
 import React from "react";
+import ScrollReveal from "../ScrollReveal";
 import styles from "./WhatWeProvide.module.css";
-import useScrollReveal from "../../hooks/useScrollReveal";
 
 const services = [
   {
@@ -67,35 +67,39 @@ const services = [
 ];
 
 const WhatWeProvide = () => {
-  const headerRef = useScrollReveal();
-  const gridRef = useScrollReveal({ threshold: 0.1 });
-
   return (
-    <section className={styles.section}>
-      <div className={styles.container}>
-        <div ref={headerRef} className={`${styles.header} reveal`}>
-          <h2 className={styles.title}>What We Provide</h2>
-          <p className={styles.subtitle}>
-            Comprehensive solutions tailored for the demands of modern
-            infrastructure and enterprise growth.
-          </p>
-        </div>
-
-        <div
-          ref={gridRef}
-          className={`${styles.grid} reveal`}
-          style={{ transitionDelay: "0.15s" }}
-        >
-          {services.map((service) => (
-            <div key={service.id} className={styles.card}>
-              <div className={styles.iconContainer}>{service.icon}</div>
-              <h3 className={styles.cardTitle}>{service.title}</h3>
-              <p className={styles.cardDesc}>{service.description}</p>
+    <ScrollReveal direction="up" delay={0.2}>
+      <section className={styles.section}>
+        <div className={styles.container}>
+          <ScrollReveal direction="up" delay={0.4}>
+            <div className={styles.header}>
+              <h2 className={styles.title}>What We Provide</h2>
+              <p className={styles.subtitle}>
+                Comprehensive solutions tailored for the demands of modern
+                infrastructure and enterprise growth.
+              </p>
             </div>
-          ))}
+          </ScrollReveal>
+
+          <div className={styles.grid}>
+            {services.map((service, index) => (
+              <ScrollReveal
+                key={service.id}
+                direction="up"
+                delay={0.6 + (index * 0.2)}
+                duration={0.5}
+              >
+                <div className={styles.card}>
+                  <div className={styles.iconContainer}>{service.icon}</div>
+                  <h3 className={styles.cardTitle}>{service.title}</h3>
+                  <p className={styles.cardDesc}>{service.description}</p>
+                </div>
+              </ScrollReveal>
+            ))}
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
+    </ScrollReveal>
   );
 };
 

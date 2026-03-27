@@ -3,212 +3,44 @@ import { useParams, useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import ScrollProgress from "../components/ScrollProgress";
+import ScrollReveal from "../components/ScrollReveal";
 import { LenisProvider } from "../context/LenisContext";
 import { useCart } from "../context/CartContext";
+import { supabase } from "../lib/supabase";
 import styles from "./ProductDetail.module.css";
-
-// Product data
-const PRODUCTS = [
-  {
-    id: 1,
-    name: "Denyo 25 KVA Silent",
-    series: "DENYO SERIES",
-    description:
-      "Ultra-silent operation with high-efficiency diesel combustion...",
-    image:
-      "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=500&q=80&auto=format&fit=crop",
-    rating: 4.9,
-    price: 12499,
-    status: "IN STOCK",
-    brand: "Denyo",
-    capacity: "25KVA",
-    fuelType: "Diesel",
-    priceRange: "10000-15000",
-  },
-  {
-    id: 2,
-    name: "Cummins 45 KVA Industrial",
-    series: "CUMMINS POWER",
-    description:
-      "Heavy-duty power for construction sites and large-scale industrial applications...",
-    image:
-      "https://images.unsplash.com/photo-1621905167918-48416bd8575a?w=500&q=80&auto=format&fit=crop",
-    rating: 4.8,
-    price: 18750,
-    status: "IN STOCK",
-    brand: "Cummins",
-    capacity: "45KVA",
-    fuelType: "Diesel",
-    priceRange: "15000-25000",
-  },
-  {
-    id: 3,
-    name: "Honshu 15 KVA Compact",
-    series: "HONSHU PRIME",
-    description:
-      "Our proprietary design offering the best power-to-weight ratio in its class...",
-    image:
-      "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=500&q=80&auto=format&fit=crop",
-    rating: 5.0,
-    price: 8900,
-    status: "IN STOCK",
-    brand: "Honshu",
-    capacity: "15KVA",
-    fuelType: "Diesel",
-    priceRange: "5000-15000",
-  },
-  {
-    id: 4,
-    name: "CAT C4.4 100 KVA",
-    series: "CAT DIESEL",
-    description:
-      "Maximum reliability for critical mission-infrastructure. Includes automated control systems...",
-    image:
-      "https://images.unsplash.com/photo-1581092162562-40038f56c232?w=500&q=80&auto=format&fit=crop",
-    rating: 4.7,
-    price: 34200,
-    status: "IN STOCK",
-    brand: "Caterpillar",
-    capacity: "100KVA",
-    fuelType: "Diesel",
-    priceRange: "30000-50000",
-  },
-  {
-    id: 5,
-    name: "Denyo 60 KVA Hybrid",
-    series: "DENYO ELITE",
-    description:
-      "Eco-friendly hybrid power solution with integrated battery backup for seamless transitions...",
-    image:
-      "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=500&q=80&auto=format&fit=crop",
-    rating: 4.9,
-    price: 26500,
-    status: "IN STOCK",
-    brand: "Denyo",
-    capacity: "60KVA",
-    fuelType: "Hybrid",
-    priceRange: "25000-35000",
-  },
-  {
-    id: 6,
-    name: "Cummins 30 KVA Basic",
-    series: "CUMMINS PEAK",
-    description:
-      "No-frills power for farming and rural applications. Easy maintenance and durable...",
-    image:
-      "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=500&q=80&auto=format&fit=crop",
-    rating: 4.8,
-    price: 10200,
-    status: "IN STOCK",
-    brand: "Cummins",
-    capacity: "30KVA",
-    fuelType: "Diesel",
-    priceRange: "10000-15000",
-  },
-  {
-    id: 7,
-    name: "Honshu 50 KVA Pro",
-    series: "HONSHU PRIME",
-    description:
-      "Professional-grade generator with advanced cooling and noise reduction features...",
-    image:
-      "https://images.unsplash.com/photo-1581092162562-40038f56c232?w=500&q=80&auto=format&fit=crop",
-    rating: 4.9,
-    price: 22000,
-    status: "IN STOCK",
-    brand: "Honshu",
-    capacity: "50KVA",
-    fuelType: "Diesel",
-    priceRange: "20000-30000",
-  },
-  {
-    id: 8,
-    name: "Denyo 75 KVA Premium",
-    series: "DENYO SERIES",
-    description:
-      "Premium quality with extended warranty and comprehensive maintenance packages...",
-    image:
-      "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=500&q=80&auto=format&fit=crop",
-    rating: 5.0,
-    price: 31500,
-    status: "IN STOCK",
-    brand: "Denyo",
-    capacity: "75KVA",
-    fuelType: "Diesel",
-    priceRange: "30000-50000",
-  },
-  {
-    id: 9,
-    name: "Cummins 20 KVA Compact",
-    series: "CUMMINS POWER",
-    description:
-      "Compact and portable for mobile applications and temporary power needs...",
-    image:
-      "https://images.unsplash.com/photo-1621905167918-48416bd8575a?w=500&q=80&auto=format&fit=crop",
-    rating: 4.8,
-    price: 9500,
-    status: "IN STOCK",
-    brand: "Cummins",
-    capacity: "20KVA",
-    fuelType: "Diesel",
-    priceRange: "5000-15000",
-  },
-  {
-    id: 10,
-    name: "Honshu 80 KVA Industrial",
-    series: "HONSHU PRIME",
-    description:
-      "Heavy-duty industrial generator with integrated load management system...",
-    image:
-      "https://images.unsplash.com/photo-1581092162562-40038f56c232?w=500&q=80&auto=format&fit=crop",
-    rating: 4.9,
-    price: 35800,
-    status: "IN STOCK",
-    brand: "Honshu",
-    capacity: "80KVA",
-    fuelType: "Diesel",
-    priceRange: "30000-50000",
-  },
-  {
-    id: 11,
-    name: "CAT C6.6 150 KVA",
-    series: "CAT DIESEL",
-    description:
-      "Enterprise-level power generation with advanced diagnostic capabilities...",
-    image:
-      "https://images.unsplash.com/photo-1581092162562-40038f56c232?w=500&q=80&auto=format&fit=crop",
-    rating: 5.0,
-    price: 52000,
-    status: "IN STOCK",
-    brand: "Caterpillar",
-    capacity: "150KVA",
-    fuelType: "Diesel",
-    priceRange: "50000+",
-  },
-  {
-    id: 12,
-    name: "Denyo 40 KVA Standard",
-    series: "DENYO SERIES",
-    description:
-      "Standard configuration suitable for most industrial and commercial applications...",
-    image:
-      "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=500&q=80&auto=format&fit=crop",
-    rating: 4.9,
-    price: 16700,
-    status: "IN STOCK",
-    brand: "Denyo",
-    capacity: "40KVA",
-    fuelType: "Diesel",
-    priceRange: "15000-25000",
-  },
-];
 
 const ProductDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { addToCart } = useCart();
+  const [product, setProduct] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [addedToCart, setAddedToCart] = useState(false);
+
+  // Fetch product from Supabase
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        setIsLoading(true);
+        const { data, error } = await supabase
+          .from("products")
+          .select("*")
+          .eq("id", parseInt(id))
+          .single();
+
+        if (error) throw error;
+        setProduct(data);
+      } catch (err) {
+        console.error("Error fetching product:", err);
+        setProduct(null);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchProduct();
+  }, [id]);
 
   // Scroll to top when product ID changes
   useEffect(() => {
@@ -218,7 +50,17 @@ const ProductDetail = () => {
     setAddedToCart(false);
   }, [id]);
 
-  const product = PRODUCTS.find((p) => p.id === parseInt(id));
+  if (isLoading) {
+    return (
+      <LenisProvider>
+        <Navbar />
+        <div className={styles.notFound}>
+          <h1>Loading product...</h1>
+        </div>
+        <Footer />
+      </LenisProvider>
+    );
+  }
 
   if (!product) {
     return (
@@ -256,27 +98,35 @@ const ProductDetail = () => {
       <Navbar />
 
       <main className={styles.pageWrapper}>
-        <div className={styles.container}>
-          {/* Back Button */}
-          <button
-            className={styles.backBtn}
-            onClick={() => navigate("/products")}
-          >
-            ←
-          </button>
+        <ScrollReveal direction="fade" delay={0.2}>
+          <div className={styles.container}>
+            {/* Back Button */}
+            <ScrollReveal direction="left" delay={0.4}>
+              <button
+                className={styles.backBtn}
+                onClick={() => navigate("/products")}
+              >
+                ←
+              </button>
+            </ScrollReveal>
 
-          <div className={styles.content}>
-            {/* Left Side - Images */}
-            <div className={styles.imageSection}>
-              <div className={styles.mainImageContainer}>
-                <img
-                  src={productImages[selectedImageIndex]}
-                  alt={product.name}
-                />
-                <span className={styles.statusBadge}>{product.status}</span>
-              </div>
+            <ScrollReveal direction="up" delay={0.6}>
+              <div className={styles.content}>
+                {/* Left Side - Images */}
+                <ScrollReveal direction="left" delay={0.8}>
+                  <div className={styles.imageSection}>
+                    <ScrollReveal direction="scale" delay={1.0}>
+                      <div className={styles.mainImageContainer}>
+                        <img
+                          src={productImages[selectedImageIndex]}
+                          alt={product.name}
+                        />
+                        <span className={styles.statusBadge}>{product.status}</span>
+                      </div>
+                    </ScrollReveal>
 
-              <div className={styles.thumbnailsContainer}>
+                    <ScrollReveal direction="up" delay={1.2}>
+                      <div className={styles.thumbnailsContainer}>
                 {productImages.map((image, index) => (
                   <button
                     key={index}
@@ -314,10 +164,12 @@ const ProductDetail = () => {
                   ▶
                 </button>
               </div>
-            </div>
+            </ScrollReveal>
+          </div>
+        </ScrollReveal>
 
-            {/* Right Side - Details */}
-            <div className={styles.detailsSection}>
+        {/* Right Side - Details */}
+        <div className={styles.detailsSection}>
               <div className={styles.breadcrumb}>
                 <span>INDUSTRIAL</span>
                 <span className={styles.separator}>/</span>
@@ -392,11 +244,13 @@ const ProductDetail = () => {
               </div>
             </div>
           </div>
-        </div>
-      </main>
+        </ScrollReveal>
+      </div>
+    </ScrollReveal>
+  </main>
 
-      <Footer />
-    </LenisProvider>
+  <Footer />
+</LenisProvider>
   );
 };
 

@@ -1,6 +1,0 @@
-{
-  "buildCommand": "npm run build",
-  "installCommand": "npm ci --legacy-peer-deps",
-  "devCommand": "npm run dev",
-  "nodeVersion": "18.17.0"
-}

@@ -2,8 +2,10 @@ import React, { useState, useEffect } from "react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import ScrollProgress from "../components/ScrollProgress";
+import ScrollReveal from "../components/ScrollReveal";
 import SuccessModal from "../components/SuccessModal";
 import { LenisProvider } from "../context/LenisContext";
+import { sanitizeInput, isValidEmail, isValidLength } from "../utils/security";
 import styles from "./Contact.module.css";
 
 function Contact() {
@@ -36,42 +38,53 @@ function Contact() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validation
-    if (!formData.firstName.trim()) {
-      alert("Please enter your first name");
+    // Enhanced Validation
+    if (!isValidLength(formData.firstName, 2, 50)) {
+      alert("First name must be between 2 and 50 characters");
       return;
     }
-    if (!formData.lastName.trim()) {
-      alert("Please enter your last name");
+    if (!isValidLength(formData.lastName, 2, 50)) {
+      alert("Last name must be between 2 and 50 characters");
       return;
     }
-    if (!formData.email.trim()) {
-      alert("Please enter your email address");
+    if (!isValidEmail(formData.email)) {
+      alert("Please enter a valid email address");
       return;
     }
-    if (!formData.message.trim()) {
-      alert("Please enter a message");
+    if (!isValidLength(formData.message, 10, 2000)) {
+      alert("Message must be between 10 and 2000 characters");
       return;
     }
 
     setIsSubmitting(true);
 
     try {
+      // Sanitize all inputs to prevent XSS
+      const sanitizedFirstName = sanitizeInput(formData.firstName.trim());
+      const sanitizedLastName = sanitizeInput(formData.lastName.trim());
+      const sanitizedEmail = sanitizeInput(formData.email.trim());
+      const sanitizedMessage = sanitizeInput(formData.message.trim());
+      const sanitizedService = sanitizeInput(formData.serviceInterest);
+
       // Format message for WhatsApp
       const message = `📧 CONTACT INQUIRY
 
-Name: ${formData.firstName} ${formData.lastName}
-Email: ${formData.email}
-Service Interest: ${formData.serviceInterest}
+Name: ${sanitizedFirstName} ${sanitizedLastName}
+Email: ${sanitizedEmail}
+Service Interest: ${sanitizedService}
 
 Message:
-${formData.message}`;
+${sanitizedMessage}`;
 
       // Encode message
       const encodedMessage = encodeURIComponent(message);
 
+      // Get WhatsApp phone from environment variable
+      const whatsappPhone =
+        import.meta.env.VITE_WHATSAPP_PHONE || "94701400093";
+
       // Open WhatsApp
-      const whatsappURL = `https://wa.me/94701400093?text=${encodedMessage}`;
+      const whatsappURL = `https://wa.me/${whatsappPhone}?text=${encodedMessage}`;
       window.open(whatsappURL, "_blank");
 
       // Reset form
@@ -89,7 +102,6 @@ ${formData.message}`;
       );
       setShowSuccessModal(true);
     } catch (error) {
-      console.error("Error sending message:", error);
       alert("Error sending message. Please try again.");
     } finally {
       setIsSubmitting(false);
@@ -107,151 +119,242 @@ ${formData.message}`;
         <Navbar />
 
         <div className={styles.container}>
-          {/* Hero Section */}
-          <section className={styles.heroSection}>
-            <div className={styles.heroContent}>
-              <h1 className={styles.heroTitle}>
-                Let's Build the <span className={styles.highlight}>Future</span>{" "}
-                Together.
-              </h1>
-              <p className={styles.heroDesc}>
-                Our global engineering team is ready to scale your industrial
-                infrastructure. Reach out for a consultation.
-              </p>
+          {/* Main Contact Section */}
+          <ScrollReveal direction="up" delay={0.2}>
+            <section className={styles.contactSection}>
+              {/* Left Side - Hero Content + Contact Information */}
+              <ScrollReveal direction="left" delay={0.4}>
+                <div className={styles.leftContent}>
+                  {/* Hero Content */}
+                  <div className={styles.heroContent}>
+                    <ScrollReveal direction="up" delay={0.5}>
+                      <p className={styles.eyebrow}>Get In Touch</p>
+                    </ScrollReveal>
 
-              {/* Contact Info */}
-              <div className={styles.contactInfo}>
-                <div className={styles.infoItem}>
-                  <div className={styles.infoIcon}>📍</div>
-                  <div className={styles.infoContent}>
-                    <h4>ADDRESS</h4>
-                    <p>No. 215, 231, Puttalam Road, Kurunegala, Sri Lanka</p>
+                    <ScrollReveal direction="up" delay={0.6}>
+                      <h1 className={styles.heroTitle}>
+                        Let's Build the <span className={styles.highlight}>Future</span>{" "}
+                        Together.
+                      </h1>
+                    </ScrollReveal>
+
+                    <ScrollReveal direction="up" delay={0.8}>
+                      <p className={styles.heroDesc}>
+                        Our global engineering team is ready to scale your industrial
+                        infrastructure. Reach out for a consultation.
+                      </p>
+                    </ScrollReveal>
+                  </div>
+
+                  {/* Contact Information */}
+                  <div className={styles.contactInfo}>
+                    <ScrollReveal direction="up" delay={1.0}>
+                      <div className={styles.infoItem}>
+                        <div className={styles.infoIcon}>
+                          <svg
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                          >
+                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                            <circle cx="12" cy="10" r="3"></circle>
+                          </svg>
+                        </div>
+                        <div className={styles.infoContent}>
+                          <h4>ADDRESS</h4>
+                          <p>No. 215, 231, Puttalam Road, Kurunegala, Sri Lanka</p>
+                        </div>
+                      </div>
+                    </ScrollReveal>
+
+                    <ScrollReveal direction="up" delay={1.2}>
+                      <div className={styles.infoItem}>
+                        <div className={styles.infoIcon}>
+                          <svg
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                          >
+                            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                          </svg>
+                        </div>
+                        <div className={styles.infoContent}>
+                          <h4>PHONE</h4>
+                          <p>
+                            +94 37 22 24 717
+                            <br />
+                            +94 37 46 90 349
+                            <br />
+                            +94 37 22 22 777
+                            <br />
+                            +94 37 22 22 154
+                          </p>
+                        </div>
+                      </div>
+                    </ScrollReveal>
+
+                    <ScrollReveal direction="up" delay={1.4}>
+                      <div className={styles.infoItem}>
+                        <div className={styles.infoIcon}>
+                          <svg
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                          >
+                            <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+                            <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
+                          </svg>
+                        </div>
+                        <div className={styles.infoContent}>
+                          <h4>EMAIL</h4>
+                          <p>
+                            honshu7@sltnet.lk
+                            <br />
+                            honshu7@yahoo.com
+                          </p>
+                        </div>
+                      </div>
+                    </ScrollReveal>
+
+                    <ScrollReveal direction="up" delay={1.6}>
+                      <div className={styles.infoItem}>
+                        <div className={styles.infoIcon}>
+                          <svg
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                          >
+                            <polyline points="23 7 16 12 23 17 23 7"></polyline>
+                            <rect
+                              x="1"
+                              y="5"
+                              width="15"
+                              height="14"
+                              rx="2"
+                              ry="2"
+                            ></rect>
+                          </svg>
+                        </div>
+                        <div className={styles.infoContent}>
+                          <h4>FAX</h4>
+                          <p>+94 37 22 25 314</p>
+                        </div>
+                      </div>
+                    </ScrollReveal>
                   </div>
                 </div>
+              </ScrollReveal>
 
-                <div className={styles.infoItem}>
-                  <div className={styles.infoIcon}>📱</div>
-                  <div className={styles.infoContent}>
-                    <h4>PHONE</h4>
-                    <p>
-                      +94 37 22 24 717
-                      <br />
-                      +94 37 46 90 349
-                      <br />
-                      +94 37 22 22 777
-                      <br />
-                      +94 37 22 22 154
-                    </p>
+              {/* Right Side - Contact Form */}
+              <ScrollReveal direction="right" delay={0.6}>
+                <form onSubmit={handleSubmit} className={styles.contactForm}>
+                  <ScrollReveal direction="up" delay={0.8}>
+                    <div className={styles.formHeader}>
+                      <h2>Send us a Message</h2>
+                      <p className={styles.formSubtitle}>We'll get back to you within 24 hours.</p>
+                    </div>
+                  </ScrollReveal>
+
+                  <div className={styles.formRow}>
+                    <div className={styles.formGroup}>
+                      <label htmlFor="firstName">First Name</label>
+                      <input
+                        type="text"
+                        id="firstName"
+                        name="firstName"
+                        placeholder="Kanji"
+                        value={formData.firstName}
+                        onChange={handleInputChange}
+                        disabled={isSubmitting}
+                        required
+                        minLength={2}
+                        maxLength={50}
+                      />
+                    </div>
+                    <div className={styles.formGroup}>
+                      <label htmlFor="lastName">Last Name</label>
+                      <input
+                        type="text"
+                        id="lastName"
+                        name="lastName"
+                        placeholder="Sato"
+                        value={formData.lastName}
+                        onChange={handleInputChange}
+                        disabled={isSubmitting}
+                        required
+                        minLength={2}
+                        maxLength={50}
+                      />
+                    </div>
                   </div>
-                </div>
 
-                <div className={styles.infoItem}>
-                  <div className={styles.infoIcon}>✉️</div>
-                  <div className={styles.infoContent}>
-                    <h4>EMAIL</h4>
-                    <p>
-                      honshu7@sltnet.lk
-                      <br />
-                      honshu7@yahoo.com
-                    </p>
+                  <div className={styles.formGroup}>
+                    <label htmlFor="email">Email Address</label>
+                    <input
+                      type="email"
+                      id="email"
+                      name="email"
+                      placeholder="k-sato@enterprise.com"
+                      value={formData.email}
+                      onChange={handleInputChange}
+                      disabled={isSubmitting}
+                      required
+                      maxLength={100}
+                    />
                   </div>
-                </div>
 
-                <div className={styles.infoItem}>
-                  <div className={styles.infoIcon}>📠</div>
-                  <div className={styles.infoContent}>
-                    <h4>FAX</h4>
-                    <p>+94 37 22 25 314</p>
+                  <div className={styles.formGroup}>
+                    <label htmlFor="serviceInterest">Service Interest</label>
+                    <select
+                      id="serviceInterest"
+                      name="serviceInterest"
+                      value={formData.serviceInterest}
+                      onChange={handleInputChange}
+                      disabled={isSubmitting}
+                    >
+                      <option>Industrial Construction</option>
+                      <option>Power Generation</option>
+                      <option>Equipment Rental</option>
+                      <option>Maintenance Services</option>
+                      <option>Consultation</option>
+                      <option>Other</option>
+                    </select>
                   </div>
-                </div>
-              </div>
-            </div>
 
-            {/* Contact Form */}
-            <form onSubmit={handleSubmit} className={styles.contactForm}>
-              <h2>Send us a Message</h2>
+                  <div className={styles.formGroup}>
+                    <label htmlFor="message">Message</label>
+                    <textarea
+                      id="message"
+                      name="message"
+                      placeholder="How can we help you?"
+                      rows="6"
+                      value={formData.message}
+                      onChange={handleInputChange}
+                      disabled={isSubmitting}
+                      required
+                      minLength={10}
+                      maxLength={2000}
+                    />
+                  </div>
 
-              <div className={styles.formRow}>
-                <div className={styles.formGroup}>
-                  <label htmlFor="firstName">First Name</label>
-                  <input
-                    type="text"
-                    id="firstName"
-                    name="firstName"
-                    placeholder="Kanji"
-                    value={formData.firstName}
-                    onChange={handleInputChange}
-                    disabled={isSubmitting}
-                  />
-                </div>
-                <div className={styles.formGroup}>
-                  <label htmlFor="lastName">Last Name</label>
-                  <input
-                    type="text"
-                    id="lastName"
-                    name="lastName"
-                    placeholder="Sato"
-                    value={formData.lastName}
-                    onChange={handleInputChange}
-                    disabled={isSubmitting}
-                  />
-                </div>
-              </div>
-
-              <div className={styles.formGroup}>
-                <label htmlFor="email">Email Address</label>
-                <input
-                  type="email"
-                  id="email"
-                  name="email"
-                  placeholder="k-sato@enterprise.com"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  disabled={isSubmitting}
-                />
-              </div>
-
-              <div className={styles.formGroup}>
-                <label htmlFor="serviceInterest">Service Interest</label>
-                <select
-                  id="serviceInterest"
-                  name="serviceInterest"
-                  value={formData.serviceInterest}
-                  onChange={handleInputChange}
-                  disabled={isSubmitting}
-                >
-                  <option>Industrial Construction</option>
-                  <option>Power Generation</option>
-                  <option>Equipment Rental</option>
-                  <option>Maintenance Services</option>
-                  <option>Consultation</option>
-                  <option>Other</option>
-                </select>
-              </div>
-
-              <div className={styles.formGroup}>
-                <label htmlFor="message">Message</label>
-                <textarea
-                  id="message"
-                  name="message"
-                  placeholder="How can we help you?"
-                  rows="6"
-                  value={formData.message}
-                  onChange={handleInputChange}
-                  disabled={isSubmitting}
-                />
-              </div>
-
-              <button
-                type="submit"
-                className={styles.submitBtn}
-                disabled={isSubmitting}
-              >
-                {isSubmitting ? "Sending..." : "Send Message"}
-                <span className={styles.arrow}>➜</span>
-              </button>
-            </form>
-          </section>
+                  <ScrollReveal direction="up" delay={1.0}>
+                    <button
+                      type="submit"
+                      className={styles.submitBtn}
+                      disabled={isSubmitting}
+                    >
+                      {isSubmitting ? "Sending..." : "Send Message"}
+                      <span className={styles.arrow}>➜</span>
+                    </button>
+                  </ScrollReveal>
+                </form>
+              </ScrollReveal>
+            </section>
+          </ScrollReveal>
         </div>
 
         <Footer />
