@@ -16,6 +16,14 @@
   --text-white: #f0f4f0;
   --text-muted: #8a9e8a;
   --border: rgba(74, 222, 128, 0.12);
+
+  /* Shared section / card tokens */
+  --border-section: 1px solid rgba(74, 222, 128, 0.06);
+  --border-subtle: rgba(74, 222, 128, 0.08);
+  --border-hover: rgba(74, 222, 128, 0.28);
+  --card-hover-bg: rgba(74, 222, 128, 0.04);
+  --shimmer: linear-gradient(to right, transparent, rgba(74, 222, 128, 0.4), transparent);
+  --ease-expo: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 html {

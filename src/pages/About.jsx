@@ -8,6 +8,7 @@ import OurLegacy from "../components/About/OurLegacy";
 import WhatWeProvide from "../components/About/WhatWeProvide";
 import WhyChooseAbout from "../components/About/WhyChooseAbout";
 import styles from "./About.module.css";
+import SEO from "../components/SEO";
 
 function About() {
   // Scroll to top on component mount
@@ -19,6 +20,11 @@ function About() {
 
   return (
     <LenisProvider>
+      <SEO
+        title="About Us"
+        description="Learn about Honshu Enterprises — Sri Lanka's leading importer and supplier of Japanese industrial equipment. Our legacy of reliability, precision and service spans decades."
+        canonical="/about"
+      />
       <ScrollProgress />
       <main className={styles.pageWrapper}>
         <div className={styles.glowTop}></div>

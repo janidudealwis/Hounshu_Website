@@ -7,6 +7,7 @@ import SuccessModal from "../components/SuccessModal";
 import { LenisProvider } from "../context/LenisContext";
 import { sanitizeInput, isValidEmail, isValidLength } from "../utils/security";
 import styles from "./Contact.module.css";
+import SEO from "../components/SEO";
 
 function Contact() {
   const [formData, setFormData] = useState({
@@ -110,6 +111,11 @@ ${sanitizedMessage}`;
 
   return (
     <LenisProvider>
+      <SEO
+        title="Contact Us"
+        description="Get in touch with Honshu Enterprises for inquiries about industrial generators, forklifts, excavators and other heavy equipment in Sri Lanka. We're here to help."
+        canonical="/contact"
+      />
       <ScrollProgress />
       <main className={styles.pageWrapper}>
         <div className={styles.glowTop}></div>

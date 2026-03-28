@@ -1,190 +1,187 @@
 import React, { useState, useEffect } from "react";
 import { supabase } from "../lib/supabase";
 import { validateFile, sanitizeInput, isValidLength } from "../utils/security";
+import { PRODUCT_CATEGORIES, CATEGORY_FIELDS } from "../constants/productCategories";
 import styles from "./AddProductForm.module.css";
 
-export default function EditProductForm({
-  product,
-  onProductUpdated,
-  onCancel,
-}) {
-  const [formData, setFormData] = useState({
-    name: "",
-    brand: "",
-    series: "",
-    description: "",
-    price: "",
-    capacity: "",
-    fuelType: "Diesel",
-    status: "IN STOCK",
-    rating: 4.5,
-    priceRange: "",
+export default function EditProductForm({ product, onProductUpdated, onCancel }) {
+  const [category, setCategory] = useState("");
+  const [common, setCommon] = useState({
+    name: "", brand: "", series: "", description: "",
+    price: "", status: "IN STOCK", rating: 4.5,
   });
-
-  const [imageFile, setImageFile] = useState(null);
-  const [imagePreview, setImagePreview] = useState(null);
+  const [specs, setSpecs] = useState({});
+  const [images, setImages] = useState([]); // [{ type:'existing'|'new', url?, file?, preview }]
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
+  // Pre-populate from the product being edited
   useEffect(() => {
-    if (product) {
-      setFormData({
-        name: product.name || "",
-        brand: product.brand || "",
-        series: product.series || "",
-        description: product.description || "",
-        price: product.price || "",
-        capacity: product.capacity || "",
-        fuelType: product.fuel_type || "Diesel",
-        status: product.status || "IN STOCK",
-        rating: product.rating || 4.5,
-        priceRange: product.price_range || "",
-      });
-      setImagePreview(product.image);
-    }
+    if (!product) return;
+    setCategory(product.category || "");
+    setCommon({
+      name:        product.name || "",
+      brand:       product.brand || "",
+      series:      product.series || "",
+      description: product.description || "",
+      price:       product.price || "",
+      status:      product.status || "IN STOCK",
+      rating:      product.rating || 4.5,
+    });
+    // Load existing images
+    const existingUrls = product.images?.length > 0
+      ? product.images
+      : product.image ? [product.image] : [];
+    setImages(existingUrls.map((url) => ({ type: "existing", url, preview: url })));
+
+    // Re-hydrate specs: combine specs JSONB + mapped column values
+    const savedSpecs = product.specs || {};
+    const fields = CATEGORY_FIELDS[product.category] || [];
+    const hydrated = { ...savedSpecs };
+    fields.forEach((f) => {
+      if (f.mapTo === "capacity")  hydrated[f.name] = product.capacity  || "";
+      if (f.mapTo === "fuel_type") hydrated[f.name] = product.fuel_type || "";
+    });
+    setSpecs(hydrated);
   }, [product]);
 
-  const handleChange = (e) => {
+  const fields = category ? (CATEGORY_FIELDS[category] || []) : [];
+
+  const handleCategoryChange = (e) => {
+    const newCat = e.target.value;
+    // If category changed, reset specs but preserve mapped column values for new category
+    if (newCat !== category) {
+      const newFields = CATEGORY_FIELDS[newCat] || [];
+      const fresh = {};
+      newFields.forEach((f) => {
+        if (f.mapTo === "capacity")  fresh[f.name] = product.capacity  || "";
+        if (f.mapTo === "fuel_type") fresh[f.name] = product.fuel_type || "";
+      });
+      setSpecs(fresh);
+    }
+    setCategory(newCat);
+    setError("");
+  };
+
+  const handleCommonChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
+    setCommon((prev) => ({
       ...prev,
-      [name]: name === "price" || name === "rating" ? parseFloat(value) : value,
+      [name]: name === "price" || name === "rating" ? parseFloat(value) || "" : value,
     }));
+  };
+
+  const handleSpecChange = (e) => {
+    const { name, value } = e.target;
+    setSpecs((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
-    if (file) {
-      // Validate file
-      const validation = validateFile(file, {
-        maxSize: 5 * 1024 * 1024, // 5MB
-        allowedTypes: ['image/jpeg', 'image/png', 'image/gif', 'image/webp'],
-      });
-
-      if (!validation.valid) {
-        setError(validation.errors.join(', '));
-        e.target.value = ''; // Reset file input
-        return;
-      }
-
-      setError(''); // Clear any previous errors
-      setImageFile(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result);
-      };
-      reader.readAsDataURL(file);
+    if (!file) return;
+    if (images.length >= 3) return;
+    const validation = validateFile(file, {
+      maxSize: 5 * 1024 * 1024,
+      allowedTypes: ["image/jpeg", "image/png", "image/gif", "image/webp"],
+    });
+    if (!validation.valid) {
+      setError(validation.errors.join(", "));
+      e.target.value = "";
+      return;
     }
+    setError("");
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setImages((prev) => [...prev, { type: "new", file, preview: reader.result }]);
+    };
+    reader.readAsDataURL(file);
+    e.target.value = "";
+  };
+
+  const removeImage = (index) => {
+    setImages((prev) => prev.filter((_, i) => i !== index));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setSuccess("");
+
+    if (!category) { setError("Please select a category."); return; }
+    if (!isValidLength(common.name, 2, 200)) { setError("Product name must be 2–200 characters."); return; }
+    if (!isValidLength(common.brand, 2, 100)) { setError("Brand must be 2–100 characters."); return; }
+    if (!common.price || isNaN(common.price)) { setError("Please enter a valid price."); return; }
+    if (common.description && !isValidLength(common.description, 0, 5000)) {
+      setError("Description must be under 5,000 characters."); return;
+    }
+
+    for (const field of fields) {
+      if (field.required && !specs[field.name]?.trim()) {
+        setError(`"${field.label}" is required for this category.`);
+        return;
+      }
+    }
+
     setIsLoading(true);
-
     try {
-      // Validate required fields
-      if (
-        !formData.name ||
-        !formData.brand ||
-        !formData.price ||
-        !formData.capacity
-      ) {
-        setError("Please fill in all required fields");
-        setIsLoading(false);
-        return;
-      }
+      const capacityField = fields.find((f) => f.mapTo === "capacity");
+      const fuelField     = fields.find((f) => f.mapTo === "fuel_type");
+      const capacity  = capacityField ? (specs[capacityField.name] || "") : (product.capacity || "");
+      const fuelType  = fuelField     ? (specs[fuelField.name] || "N/A") : (product.fuel_type || "N/A");
 
-      // Enhanced validation
-      if (!isValidLength(formData.name, 2, 200)) {
-        setError("Product name must be between 2 and 200 characters");
-        setIsLoading(false);
-        return;
-      }
+      const specsJson = {};
+      fields.forEach((f) => {
+        if (!f.mapTo && specs[f.name]) specsJson[f.name] = specs[f.name];
+      });
 
-      if (!isValidLength(formData.brand, 2, 100)) {
-        setError("Brand name must be between 2 and 100 characters");
-        setIsLoading(false);
-        return;
-      }
-
-      if (formData.description && !isValidLength(formData.description, 0, 5000)) {
-        setError("Description must be less than 5000 characters");
-        setIsLoading(false);
-        return;
-      }
-
-      // Sanitize inputs
-      const sanitizedData = {
-        name: sanitizeInput(formData.name.trim()),
-        brand: sanitizeInput(formData.brand.trim()),
-        series: sanitizeInput(formData.series.trim()),
-        description: sanitizeInput(formData.description.trim()),
-        capacity: sanitizeInput(formData.capacity.trim()),
-        priceRange: sanitizeInput(formData.priceRange.trim()),
-      };
-
-      let imageUrl = product.image;
-
-      // Upload new image if one is selected
-      if (imageFile) {
-        try {
-          const fileName = `${Date.now()}-${imageFile.name}`;
-          const { data: uploadData, error: uploadError } =
-            await supabase.storage
+      // Build final image URLs: keep existing + upload new
+      const finalUrls = [];
+      for (const img of images) {
+        if (img.type === "existing") {
+          finalUrls.push(img.url);
+        } else {
+          try {
+            const fileName = `${Date.now()}-${img.file.name}`;
+            const { error: uploadError } = await supabase.storage
               .from("product-images")
-              .upload(`products/${fileName}`, imageFile);
-
-          if (uploadError) {
-            console.warn(
-              "Image upload failed, keeping existing image:",
-              uploadError,
-            );
-          } else {
-            // Get public URL of the uploaded image
-            const { data: publicUrlData } = supabase.storage
-              .from("product-images")
-              .getPublicUrl(`products/${fileName}`);
-
-            imageUrl = publicUrlData.publicUrl;
-          }
-        } catch (imgErr) {
-          console.warn("Image upload error, keeping existing image:", imgErr);
+              .upload(`products/${fileName}`, img.file);
+            if (!uploadError) {
+              const { data: urlData } = supabase.storage
+                .from("product-images")
+                .getPublicUrl(`products/${fileName}`);
+              finalUrls.push(urlData.publicUrl);
+            }
+          } catch { /* skip */ }
         }
       }
+      const imageUrl = finalUrls[0] || product.image || "";
 
-      // Update product with sanitized data
-      const { data, error } = await supabase
+      const { error: dbError } = await supabase
         .from("products")
         .update({
-          name: sanitizedData.name,
-          brand: sanitizedData.brand,
-          series: sanitizedData.series,
-          description: sanitizedData.description,
-          image: imageUrl,
-          price: parseFloat(formData.price),
-          capacity: sanitizedData.capacity,
-          fuel_type: formData.fuelType,
-          status: formData.status,
-          rating: parseFloat(formData.rating) || 4.5,
-          price_range: sanitizedData.priceRange,
+          name:        sanitizeInput(common.name.trim()),
+          brand:       sanitizeInput(common.brand.trim()),
+          series:      sanitizeInput(common.series.trim()),
+          description: sanitizeInput(common.description.trim()),
+          image:       imageUrl,
+          images:      finalUrls,
+          price:       parseFloat(common.price),
+          capacity:    sanitizeInput(capacity.trim()),
+          category:    category,
+          fuel_type:   fuelType,
+          status:      common.status,
+          rating:      parseFloat(common.rating) || 4.5,
+          specs:       specsJson,
         })
         .eq("id", product.id);
 
-      if (error) {
-        throw error;
-      }
+      if (dbError) throw dbError;
 
       setSuccess("Product updated successfully!");
-
-      // Reset form and notify parent
-      setTimeout(() => {
-        onProductUpdated();
-      }, 1500);
+      setTimeout(onProductUpdated, 1500);
     } catch (err) {
-      setError(err.message || "Failed to update product");
+      setError(err.message || "Failed to update product.");
     } finally {
       setIsLoading(false);
     }
@@ -194,237 +191,149 @@ export default function EditProductForm({
     <div className={styles.formContainer}>
       <h3 className={styles.formTitle}>Edit Product</h3>
 
-      {error && <div className={styles.error}>{error}</div>}
+      {error   && <div className={styles.error}>{error}</div>}
       {success && <div className={styles.success}>{success}</div>}
 
       <form onSubmit={handleSubmit} className={styles.form}>
-        <div className={styles.grid}>
-          {/* Product Name */}
-          <div className={styles.formGroup}>
-            <label htmlFor="name" className={styles.label}>
-              Product Name *
-            </label>
-            <input
-              type="text"
-              id="name"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              placeholder="e.g., Denyo 25 KVA Silent"
-              className={styles.input}
-              disabled={isLoading}
-              required
-              minLength={2}
-              maxLength={200}
-            />
-          </div>
 
-          {/* Brand */}
-          <div className={styles.formGroup}>
-            <label htmlFor="brand" className={styles.label}>
-              Brand *
-            </label>
-            <input
-              type="text"
-              id="brand"
-              name="brand"
-              value={formData.brand}
-              onChange={handleChange}
-              placeholder="e.g., Denyo"
-              className={styles.input}
-              disabled={isLoading}
-              required
-              minLength={2}
-              maxLength={100}
-            />
-          </div>
-
-          {/* Series */}
-          <div className={styles.formGroup}>
-            <label htmlFor="series" className={styles.label}>
-              Series
-            </label>
-            <input
-              type="text"
-              id="series"
-              name="series"
-              value={formData.series}
-              onChange={handleChange}
-              placeholder="e.g., DENYO SERIES"
-              className={styles.input}
-              disabled={isLoading}
-              maxLength={100}
-            />
-          </div>
-
-          {/* Capacity */}
-          <div className={styles.formGroup}>
-            <label htmlFor="capacity" className={styles.label}>
-              Capacity *
-            </label>
-            <input
-              type="text"
-              id="capacity"
-              name="capacity"
-              value={formData.capacity}
-              onChange={handleChange}
-              placeholder="e.g., 25KVA"
-              className={styles.input}
-              disabled={isLoading}
-              required
-              maxLength={50}
-            />
-          </div>
-
-          {/* Price */}
-          <div className={styles.formGroup}>
-            <label htmlFor="price" className={styles.label}>
-              Price (Rs.) *
-            </label>
-            <input
-              type="number"
-              id="price"
-              name="price"
-              value={formData.price}
-              onChange={handleChange}
-              placeholder="12499"
-              className={styles.input}
-              disabled={isLoading}
-              required
-              min="0"
-              max="99999999"
-            />
-          </div>
-
-          {/* Price Range */}
-          <div className={styles.formGroup}>
-            <label htmlFor="priceRange" className={styles.label}>
-              Price Range
-            </label>
-            <input
-              type="text"
-              id="priceRange"
-              name="priceRange"
-              value={formData.priceRange}
-              onChange={handleChange}
-              placeholder="e.g., 10000-15000"
-              className={styles.input}
-              disabled={isLoading}
-              maxLength={50}
-            />
-          </div>
-
-          {/* Fuel Type */}
-          <div className={styles.formGroup}>
-            <label htmlFor="fuelType" className={styles.label}>
-              Fuel Type
-            </label>
-            <select
-              id="fuelType"
-              name="fuelType"
-              value={formData.fuelType}
-              onChange={handleChange}
-              className={styles.input}
-              disabled={isLoading}
-            >
-              <option value="Diesel">Diesel</option>
-              <option value="Petrol">Petrol</option>
-              <option value="Hybrid">Hybrid</option>
-              <option value="Gas">Gas</option>
-            </select>
-          </div>
-
-          {/* Status */}
-          <div className={styles.formGroup}>
-            <label htmlFor="status" className={styles.label}>
-              Status
-            </label>
-            <select
-              id="status"
-              name="status"
-              value={formData.status}
-              onChange={handleChange}
-              className={styles.input}
-              disabled={isLoading}
-            >
-              <option value="IN STOCK">IN STOCK</option>
-              <option value="OUT OF STOCK">OUT OF STOCK</option>
-              <option value="PRE-ORDER">PRE-ORDER</option>
-            </select>
-          </div>
-
-          {/* Rating */}
-          <div className={styles.formGroup}>
-            <label htmlFor="rating" className={styles.label}>
-              Rating (0-5)
-            </label>
-            <input
-              type="number"
-              id="rating"
-              name="rating"
-              min="0"
-              max="5"
-              step="0.1"
-              value={formData.rating}
-              onChange={handleChange}
-              className={styles.input}
-              disabled={isLoading}
-            />
-          </div>
-
-          {/* Image Upload */}
-          <div className={`${styles.formGroup} ${styles.fullWidth}`}>
-            <label htmlFor="image" className={styles.label}>
-              Product Image (Optional - Leave empty to keep current)
-            </label>
-            <input
-              type="file"
-              id="image"
-              accept="image/*"
-              onChange={handleImageChange}
-              className={styles.input}
-              disabled={isLoading}
-            />
-            {imagePreview && (
-              <div className={styles.imagePreview}>
-                <img src={imagePreview} alt="Preview" />
-              </div>
-            )}
-          </div>
-
-          {/* Description */}
-          <div className={`${styles.formGroup} ${styles.fullWidth}`}>
-            <label htmlFor="description" className={styles.label}>
-              Description
-            </label>
-            <textarea
-              id="description"
-              name="description"
-              value={formData.description}
-              onChange={handleChange}
-              placeholder="Enter product description..."
-              className={styles.textarea}
-              rows="4"
-              disabled={isLoading}
-              maxLength={5000}
-            />
-          </div>
+        {/* ── Category ──────────────────────────────────── */}
+        <div className={styles.categoryStep}>
+          <label className={styles.label}>Category *</label>
+          <select value={category} onChange={handleCategoryChange}
+            className={styles.categoryPicker} disabled={isLoading} required>
+            <option value="">— Choose a category —</option>
+            {PRODUCT_CATEGORIES.map((c) => (
+              <option key={c} value={c}>{c}</option>
+            ))}
+          </select>
         </div>
 
+        {category && (
+          <div className={styles.grid}>
+
+            {/* ── Common fields ── */}
+            <div className={styles.sectionHeader}><span>Product Info</span></div>
+
+            <div className={styles.formGroup}>
+              <label className={styles.label}>Product Name *</label>
+              <input type="text" name="name" value={common.name}
+                onChange={handleCommonChange} placeholder="e.g., Denyo 25 KVA Silent"
+                className={styles.input} disabled={isLoading} required minLength={2} maxLength={200} />
+            </div>
+
+            <div className={styles.formGroup}>
+              <label className={styles.label}>Brand *</label>
+              <input type="text" name="brand" value={common.brand}
+                onChange={handleCommonChange} placeholder="e.g., Denyo"
+                className={styles.input} disabled={isLoading} required minLength={2} maxLength={100} />
+            </div>
+
+            <div className={styles.formGroup}>
+              <label className={styles.label}>Series / Model</label>
+              <input type="text" name="series" value={common.series}
+                onChange={handleCommonChange} placeholder="e.g., DCA Series"
+                className={styles.input} disabled={isLoading} maxLength={100} />
+            </div>
+
+            <div className={styles.formGroup}>
+              <label className={styles.label}>Price (Rs.) *</label>
+              <input type="number" name="price" value={common.price}
+                onChange={handleCommonChange} placeholder="e.g., 450000"
+                className={styles.input} disabled={isLoading} required min="0" max="99999999" />
+            </div>
+
+            <div className={styles.formGroup}>
+              <label className={styles.label}>Status</label>
+              <select name="status" value={common.status}
+                onChange={handleCommonChange} className={styles.input} disabled={isLoading}>
+                <option value="IN STOCK">In Stock</option>
+                <option value="OUT OF STOCK">Out of Stock</option>
+                <option value="PRE ORDER">Pre Order</option>
+              </select>
+            </div>
+
+            <div className={styles.formGroup}>
+              <label className={styles.label}>Rating (0–5)</label>
+              <input type="number" name="rating" value={common.rating}
+                onChange={handleCommonChange} min="0" max="5" step="0.1"
+                className={styles.input} disabled={isLoading} />
+            </div>
+
+            {/* ── Specs ── */}
+            <div className={styles.sectionHeader}><span>Specifications</span></div>
+
+            {fields.map((field) => (
+              <div key={field.name} className={styles.formGroup}>
+                <label className={styles.label}>
+                  {field.label}{field.required ? " *" : ""}
+                </label>
+                {field.type === "select" ? (
+                  <select name={field.name} value={specs[field.name] || ""}
+                    onChange={handleSpecChange} className={styles.input} disabled={isLoading}>
+                    <option value="">— Select —</option>
+                    {field.options.map((opt) => (
+                      <option key={opt} value={opt}>{opt}</option>
+                    ))}
+                  </select>
+                ) : (
+                  <input type={field.type} name={field.name}
+                    value={specs[field.name] || ""}
+                    onChange={handleSpecChange}
+                    placeholder={field.placeholder}
+                    className={styles.input} disabled={isLoading} />
+                )}
+              </div>
+            ))}
+
+            {/* ── Image & Description ── */}
+            <div className={styles.sectionHeader}><span>Media & Description</span></div>
+
+            <div className={`${styles.formGroup} ${styles.fullWidth}`}>
+              <label className={styles.label}>Product Images — up to 3</label>
+              <div className={styles.imagesGrid}>
+                {images.map((img, i) => (
+                  <div key={i} className={styles.imageSlot}>
+                    <img src={img.preview} alt={`Image ${i + 1}`} />
+                    <button
+                      type="button"
+                      className={styles.removeImageBtn}
+                      onClick={() => removeImage(i)}
+                      disabled={isLoading}
+                    >×</button>
+                  </div>
+                ))}
+                {images.length < 3 && (
+                  <label className={`${styles.imageSlot} ${styles.addSlot}`}>
+                    <span>+</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageChange}
+                      disabled={isLoading}
+                      style={{ display: "none" }}
+                    />
+                  </label>
+                )}
+              </div>
+            </div>
+
+            <div className={`${styles.formGroup} ${styles.fullWidth}`}>
+              <label className={styles.label}>Description</label>
+              <textarea name="description" value={common.description}
+                onChange={handleCommonChange}
+                placeholder="Enter product description..."
+                className={styles.textarea} rows="4"
+                disabled={isLoading} maxLength={5000} />
+            </div>
+          </div>
+        )}
+
         <div className={styles.formActions}>
-          <button
-            type="submit"
-            className={styles.submitBtn}
-            disabled={isLoading}
-          >
-            {isLoading ? "Updating Product..." : "Update Product"}
+          <button type="submit" className={styles.submitBtn} disabled={isLoading}>
+            {isLoading ? "Updating..." : "Update Product"}
           </button>
-          <button
-            type="button"
-            onClick={onCancel}
-            className={styles.cancelBtn}
-            disabled={isLoading}
-          >
+          <button type="button" onClick={onCancel}
+            className={styles.cancelBtn} disabled={isLoading}>
             Cancel
           </button>
         </div>

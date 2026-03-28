@@ -8,6 +8,7 @@ import { LenisProvider } from "../context/LenisContext";
 import { useCart } from "../context/CartContext";
 import { supabase } from "../lib/supabase";
 import styles from "./ProductDetail.module.css";
+import SEO from "../components/SEO";
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -77,23 +78,56 @@ const ProductDetail = () => {
     );
   }
 
-  const productImages = [
-    product.image,
-    "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=500&q=80&auto=format&fit=crop",
-    "https://images.unsplash.com/photo-1581092162562-40038f56c232?w=500&q=80&auto=format&fit=crop",
-  ];
+  const productImages = product.images?.length > 0
+    ? product.images
+    : product.image ? [product.image] : [];
 
-  const specifications = {
-    "Engine Model": "Kubota V2203-E2BG",
-    "Fuel Tank Capacity": "65 Liters",
-    "Fuel Consumption": "4.1 L/h (75% Load)",
-    "Sound Level": "63 dB(A) @ 7m",
-    "Dry Weight": "590 kg",
-    "Dimensions (L×W×H)": "1540 x 700 x 950 mm",
-  };
+  // Build specifications from real product data
+  const specEntries = [];
+  if (product.capacity)  specEntries.push(["Capacity / Size", product.capacity]);
+  if (product.fuel_type && product.fuel_type !== "N/A") specEntries.push(["Fuel Type", product.fuel_type]);
+  if (product.specs && typeof product.specs === "object") {
+    Object.entries(product.specs).forEach(([key, val]) => {
+      if (val) {
+        // Convert camelCase key to readable label
+        const label = key.replace(/([A-Z])/g, " $1").replace(/^./, (c) => c.toUpperCase());
+        specEntries.push([label, val]);
+      }
+    });
+  }
+  const specifications = Object.fromEntries(specEntries);
 
   return (
     <LenisProvider>
+      <SEO
+        title={`${product.name}${product.brand ? ` – ${product.brand}` : ""}`}
+        description={
+          product.description
+            ? `${product.description.slice(0, 140)}...`
+            : `Buy ${product.name} from Honshu Enterprises – trusted industrial equipment supplier in Sri Lanka.`
+        }
+        canonical={`/products/${product.id}`}
+        image={product.image || undefined}
+        type="product"
+        jsonLd={{
+          "@context": "https://schema.org",
+          "@type": "Product",
+          name: product.name,
+          description: product.description,
+          image: product.image,
+          brand: { "@type": "Brand", name: product.brand },
+          offers: {
+            "@type": "Offer",
+            priceCurrency: "LKR",
+            price: product.price,
+            availability:
+              product.status === "IN STOCK"
+                ? "https://schema.org/InStock"
+                : "https://schema.org/OutOfStock",
+            seller: { "@type": "Organization", name: "Honshu Enterprises" },
+          },
+        }}
+      />
       <ScrollProgress />
       <Navbar />
 
@@ -173,29 +207,41 @@ const ProductDetail = () => {
               <div className={styles.breadcrumb}>
                 <span>INDUSTRIAL</span>
                 <span className={styles.separator}>/</span>
-                <span>GENERATORS</span>
-                <span className={styles.separator}>/</span>
-                <span className={styles.currentCategory}>
-                  {product.series.toUpperCase()}
-                </span>
+                <span>{product.category?.toUpperCase()}</span>
+                {product.series && <>
+                  <span className={styles.separator}>/</span>
+                  <span className={styles.currentCategory}>{product.series.toUpperCase()}</span>
+                </>}
               </div>
 
               <h1 className={styles.productName}>{product.name}</h1>
               <p className={styles.productDescription}>{product.description}</p>
 
               <div className={styles.keySpecs}>
-                <div className={styles.specItem}>
-                  <label>POWER OUTPUT</label>
-                  <span>{product.capacity}</span>
-                </div>
-                <div className={styles.specItem}>
-                  <label>VOLTAGE</label>
-                  <span>240V</span>
-                </div>
-                <div className={styles.specItem}>
-                  <label>PHASE</label>
-                  <span>Single</span>
-                </div>
+                {product.capacity && (
+                  <div className={styles.specItem}>
+                    <label>CAPACITY / SIZE</label>
+                    <span>{product.capacity}</span>
+                  </div>
+                )}
+                {product.fuel_type && product.fuel_type !== "N/A" && (
+                  <div className={styles.specItem}>
+                    <label>FUEL TYPE</label>
+                    <span>{product.fuel_type}</span>
+                  </div>
+                )}
+                {product.specs?.phase && (
+                  <div className={styles.specItem}>
+                    <label>PHASE</label>
+                    <span>{product.specs.phase}</span>
+                  </div>
+                )}
+                {product.specs?.voltageOutput && (
+                  <div className={styles.specItem}>
+                    <label>VOLTAGE</label>
+                    <span>{product.specs.voltageOutput}</span>
+                  </div>
+                )}
               </div>
 
               <div className={styles.specificationSection}>
@@ -227,7 +273,7 @@ const ProductDetail = () => {
                 <div className={styles.priceInfo}>
                   <span className={styles.startingAt}>STARTING AT</span>
                   <span className={styles.price}>
-                    ${product.price.toLocaleString()}
+                    LKR {product.price.toLocaleString()}
                   </span>
                 </div>
                 <button

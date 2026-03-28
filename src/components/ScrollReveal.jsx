@@ -40,8 +40,8 @@ const ScrollReveal = ({
   children,
   direction = "up",
   delay = 0,
-  duration = 0.55,
-  distance = 28,
+  duration = 0.5,
+  distance = 18,
   once = true,
   threshold = 0.1,
   className = "",
@@ -51,7 +51,7 @@ const ScrollReveal = ({
   const isInView = useInView(ref, {
     threshold,
     once,
-    margin: "0px 0px -60px 0px",
+    margin: "0px 0px 80px 0px",
   });
 
   const variants = buildVariants(direction, distance, duration, delay);

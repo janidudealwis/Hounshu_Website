@@ -37,6 +37,8 @@ const WhyChoose = () => {
         {/* Left */}
         <ScrollReveal direction="left" delay={0.2}>
           <div className={styles.left}>
+            <p className={styles.eyebrow}>Our Advantage</p>
+
             <ScrollReveal direction="up" delay={0.4}>
               <h2 className={styles.title}>
                 Why Choose

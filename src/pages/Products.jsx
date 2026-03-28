@@ -10,8 +10,9 @@ import { supabase } from "../lib/supabase";
 import { PRODUCT_CATEGORIES } from "../constants/productCategories";
 import { MOCK_PRODUCTS } from "../constants/mockProducts";
 import styles from "./Products.module.css";
+import SEO from "../components/SEO";
 
-const ITEMS_PER_PAGE = 6;
+const ITEMS_PER_PAGE = 15;
 
 const Products = () => {
   const navigate = useNavigate();
@@ -133,6 +134,11 @@ const Products = () => {
 
   return (
     <LenisProvider>
+      <SEO
+        title="Industrial Equipment – Generators, Forklifts & More"
+        description="Browse Honshu Enterprises' full range of industrial equipment — diesel generators, heavy forklifts, excavators, motor graders, road rollers and power systems available in Sri Lanka."
+        canonical="/products"
+      />
       <ScrollProgress />
       <Navbar />
       <main className={styles.pageWrapper}>
@@ -141,117 +147,127 @@ const Products = () => {
             {/* Sidebar */}
             <ScrollReveal direction="left" delay={0.4}>
               <aside className={styles.sidebar}>
-                <div className={styles.filterSection}>
-                  <h3 className={styles.filterTitle}>FILTERS</h3>
+                <div className={styles.filterCard}>
 
-                  <ScrollReveal direction="up" delay={0.6}>
-                    <div className={styles.filter}>
-                      <label className={styles.filterLabel}>🏢 Brand</label>
-                      <div className={styles.filterOptions}>
+                  {/* Filter Header */}
+                  <div className={styles.filterHeader}>
+                    <div className={styles.filterHeaderLeft}>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4ade80" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
+                      </svg>
+                      <span className={styles.filterTitle}>Filters</span>
+                      {(selectedBrand !== "All" || selectedCapacity !== "All" || selectedCategory !== "All") && (
+                        <span className={styles.activeCount}>
+                          {[selectedBrand, selectedCapacity, selectedCategory].filter(v => v !== "All").length}
+                        </span>
+                      )}
+                    </div>
+                    {(selectedBrand !== "All" || selectedCapacity !== "All" || selectedCategory !== "All") && (
+                      <button
+                        className={styles.clearAll}
+                        onClick={() => {
+                          setSelectedBrand("All");
+                          setSelectedCapacity("All");
+                          setSelectedCategory("All");
+                          setCurrentPage(1);
+                        }}
+                      >
+                        Clear all
+                      </button>
+                    )}
+                  </div>
+
+                  <div className={styles.filterBody}>
+
+                    {/* Brand */}
+                    <div className={styles.filterGroup}>
+                      <div className={styles.filterGroupHeader}>
+                        <span className={styles.filterLabel}>Brand</span>
+                        {selectedBrand !== "All" && (
+                          <button className={styles.clearOne} onClick={() => { setSelectedBrand("All"); setCurrentPage(1); }}>✕</button>
+                        )}
+                      </div>
+                      <div className={styles.filterChips}>
                         {brands.map((brand) => (
                           <button
                             key={brand}
-                            className={`${styles.filterOption} ${selectedBrand === brand ? styles.active : ""}`}
-                            onClick={() => {
-                              setSelectedBrand(brand);
-                              setCurrentPage(1);
-                            }}
+                            className={`${styles.chip} ${selectedBrand === brand ? styles.chipActive : ""}`}
+                            onClick={() => { setSelectedBrand(brand); setCurrentPage(1); }}
                           >
                             {brand}
                           </button>
                         ))}
                       </div>
                     </div>
-                  </ScrollReveal>
 
-                  <ScrollReveal direction="up" delay={0.8}>
-                    <div className={styles.filter}>
-                      <label className={styles.filterLabel}>⚡ Power Capacity</label>
-                      <div className={styles.filterOptions}>
-                        {capacities.map((capacity) => (
-                          <button
-                            key={capacity}
-                            className={`${styles.filterOption} ${selectedCapacity === capacity ? styles.active : ""}`}
-                            onClick={() => {
-                              setSelectedCapacity(capacity);
-                              setCurrentPage(1);
-                            }}
-                          >
-                            {capacity}
-                          </button>
-                        ))}
+                    <div className={styles.divider} />
+
+                    {/* Category */}
+                    <div className={styles.filterGroup}>
+                      <div className={styles.filterGroupHeader}>
+                        <span className={styles.filterLabel}>Category</span>
+                        {selectedCategory !== "All" && (
+                          <button className={styles.clearOne} onClick={() => { setSelectedCategory("All"); setCurrentPage(1); }}>✕</button>
+                        )}
                       </div>
-                    </div>
-                  </ScrollReveal>
-
-                  <ScrollReveal direction="up" delay={1.0}>
-                    <div className={styles.filter}>
-                      <label className={styles.filterLabel}>🏷️ Category</label>
-                      <div className={styles.filterOptions}>
+                      <div className={styles.filterChips}>
                         {categories.map((category) => (
                           <button
                             key={category}
-                            className={`${styles.filterOption} ${selectedCategory === category ? styles.active : ""}`}
-                            onClick={() => {
-                              setSelectedCategory(category);
-                              setCurrentPage(1);
-                            }}
+                            className={`${styles.chip} ${selectedCategory === category ? styles.chipActive : ""}`}
+                            onClick={() => { setSelectedCategory(category); setCurrentPage(1); }}
                           >
                             {category}
                           </button>
                         ))}
                       </div>
                     </div>
-                  </ScrollReveal>
 
-                  {/* Quick Selection */}
-                  <ScrollReveal direction="up" delay={1.2}>
-                    <div className={styles.quickSelection}>
-                      <h4 className={styles.quickTitle}>Quick Selection</h4>
-                      <div className={styles.quickButtons}>
-                        <button
-                          className={styles.quickBtn}
-                          onClick={() => {
-                            setSelectedBrand("Denyo");
-                            setSelectedCapacity("All");
-                            setSelectedCategory("All");
-                          }}
-                        >
+                    <div className={styles.divider} />
+
+                    {/* Capacity */}
+                    <div className={styles.filterGroup}>
+                      <div className={styles.filterGroupHeader}>
+                        <span className={styles.filterLabel}>Power / Capacity</span>
+                        {selectedCapacity !== "All" && (
+                          <button className={styles.clearOne} onClick={() => { setSelectedCapacity("All"); setCurrentPage(1); }}>✕</button>
+                        )}
+                      </div>
+                      <div className={styles.filterChips}>
+                        {capacities.map((capacity) => (
+                          <button
+                            key={capacity}
+                            className={`${styles.chip} ${selectedCapacity === capacity ? styles.chipActive : ""}`}
+                            onClick={() => { setSelectedCapacity(capacity); setCurrentPage(1); }}
+                          >
+                            {capacity}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className={styles.divider} />
+
+                    {/* Quick Presets */}
+                    <div className={styles.filterGroup}>
+                      <span className={styles.filterLabel}>Quick Presets</span>
+                      <div className={styles.presetButtons}>
+                        <button className={styles.presetBtn} onClick={() => { setSelectedBrand("Denyo"); setSelectedCapacity("All"); setSelectedCategory("All"); setCurrentPage(1); }}>
                           Denyo
                         </button>
-                        <button
-                          className={styles.quickBtn}
-                          onClick={() => {
-                            setSelectedBrand("Cummins");
-                            setSelectedCapacity("All");
-                            setSelectedCategory("All");
-                          }}
-                        >
+                        <button className={styles.presetBtn} onClick={() => { setSelectedBrand("Cummins"); setSelectedCapacity("All"); setSelectedCategory("All"); setCurrentPage(1); }}>
                           Cummins
                         </button>
-                        <button
-                          className={styles.quickBtn}
-                          onClick={() => {
-                            setSelectedBrand("All");
-                            setSelectedCapacity("25KVA");
-                            setSelectedCategory("All");
-                          }}
-                        >
-                          25MVA
+                        <button className={styles.presetBtn} onClick={() => { setSelectedBrand("All"); setSelectedCapacity("25KVA"); setSelectedCategory("All"); setCurrentPage(1); }}>
+                          25 KVA
                         </button>
-                        <button
-                          className={styles.quickBtn}
-                          onClick={() => {
-                            setSelectedBrand("Honshu");
-                            setSelectedCapacity("All");
-                            setSelectedCategory("All");
-                          }}
-                        >
-                          Silent
+                        <button className={styles.presetBtn} onClick={() => { setSelectedBrand("Honshu"); setSelectedCapacity("All"); setSelectedCategory("All"); setCurrentPage(1); }}>
+                          Honshu
                         </button>
                       </div>
                     </div>
-                  </ScrollReveal>
+
+                  </div>
                 </div>
               </aside>
             </ScrollReveal>
@@ -341,16 +357,10 @@ const Products = () => {
               <>
                 {console.log("About to render products grid with", paginatedProducts.length, "products")}
                 {/* Products Grid */}
-                <ScrollReveal direction="up" delay={1.0}>
                   <div className={styles.productsGrid}>
-                    {paginatedProducts.map((product, index) => (
-                      <ScrollReveal
-                        key={product.id}
-                        direction="up"
-                        delay={1.2 + (index * 0.1)}
-                        duration={0.4}
-                      >
+                    {paginatedProducts.map((product) => (
                         <div
+                          key={product.id}
                           className={styles.productCard}
                           onClick={() => navigate(`/products/${product.id}`)}
                           style={{ cursor: "pointer" }}
@@ -373,31 +383,11 @@ const Products = () => {
                           {product.description}
                         </p>
 
-                        <div className={styles.rating}>
-                          <span className={styles.ratingValue}>
-                            {product.rating}
-                          </span>
-                          <div className={styles.stars}>
-                            {[...Array(5)].map((_, i) => (
-                              <span
-                                key={i}
-                                className={
-                                  i < Math.floor(product.rating)
-                                    ? styles.starFilled
-                                    : styles.starEmpty
-                                }
-                              >
-                                ★
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-
                         <div className={styles.priceSection}>
                           <span className={styles.startingAt}>Starting at</span>
                           <div className={styles.priceRow}>
                             <span className={styles.price}>
-                              ${product.price.toLocaleString()}
+                              LKR {product.price.toLocaleString()}
                             </span>
                             <button
                               className={`${styles.addToCartBtn} ${addedToCart === product.id ? styles.added : ""}`}
@@ -424,10 +414,8 @@ const Products = () => {
                         </div>
                       </div>
                     </div>
-                  </ScrollReveal>
                   ))}
                   </div>
-                </ScrollReveal>
 
                 {/* Pagination */}
                 <ScrollReveal direction="up" delay={1.4}>

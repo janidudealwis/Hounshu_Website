@@ -10,6 +10,7 @@ import { useCart } from "../context/CartContext";
 import { supabase } from "../lib/supabase";
 import { sanitizeInput, isValidPhone, isValidLength } from "../utils/security";
 import styles from "./Cart.module.css";
+import SEO from "../components/SEO";
 
 const Cart = () => {
   const navigate = useNavigate();
@@ -139,13 +140,18 @@ Total: $${Math.round(total).toLocaleString()}`;
   if (cartItems.length === 0) {
     return (
       <LenisProvider>
+        <SEO title="Your Cart" noindex={true} />
         <ScrollProgress />
         <Navbar />
         <main className={styles.pageWrapper}>
           <ScrollReveal direction="up" delay={0.2}>
             <div className={styles.emptyCart}>
               <ScrollReveal direction="scale" delay={0.4}>
-                <div className={styles.emptyIcon}>🛒</div>
+                <div className={styles.emptyIcon}>
+                  <svg viewBox="0 0 24 24" fill="none" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/>
+                  </svg>
+                </div>
               </ScrollReveal>
 
               <ScrollReveal direction="up" delay={0.6}>
@@ -180,6 +186,7 @@ Total: $${Math.round(total).toLocaleString()}`;
 
   return (
     <LenisProvider>
+      <SEO title="Your Cart" noindex={true} />
       <ScrollProgress />
       <Navbar />
 
@@ -187,7 +194,13 @@ Total: $${Math.round(total).toLocaleString()}`;
         <ScrollReveal direction="fade" delay={0.2}>
           <div className={styles.container}>
             <ScrollReveal direction="up" delay={0.4}>
-              <h1 className={styles.pageTitle}>Shopping Cart</h1>
+              <div className={styles.pageHeader}>
+                <p className={styles.eyebrow}>Your Selection</p>
+                <h1 className={styles.pageTitle}>
+                  Shopping Cart
+                  <span className={styles.itemCount}>{cartItems.length}</span>
+                </h1>
+              </div>
             </ScrollReveal>
 
             <ScrollReveal direction="up" delay={0.6}>

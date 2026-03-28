@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import ScrollReveal from "./ScrollReveal";
 import styles from "./EquipmentCategories.module.css";
 
@@ -21,7 +22,7 @@ const categories = [
         <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
       </svg>
     ),
-    img: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80&auto=format&fit=crop",
+    img: "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=600&q=80&auto=format&fit=crop",
   },
   {
     id: 2,
@@ -45,7 +46,7 @@ const categories = [
         <path d="M14 6v5h6" />
       </svg>
     ),
-    img: "https://images.unsplash.com/photo-1590247813693-5541d1c609fd?w=600&q=80&auto=format&fit=crop",
+    img: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&q=80&auto=format&fit=crop",
   },
   {
     id: 3,
@@ -68,7 +69,7 @@ const categories = [
         <path d="M16 10l3 3-5 2" />
       </svg>
     ),
-    img: "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=600&q=80&auto=format&fit=crop",
+    img: "https://images.unsplash.com/photo-1567789884554-0b844b597180?w=600&q=80&auto=format&fit=crop",
   },
   {
     id: 4,
@@ -89,7 +90,7 @@ const categories = [
         <circle cx="12" cy="12" r="4" />
       </svg>
     ),
-    img: "https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?w=600&q=80&auto=format&fit=crop",
+    img: "https://images.unsplash.com/photo-1497435334941-8c899ee9e8e9?w=600&q=80&auto=format&fit=crop",
   },
 ];
 
@@ -100,14 +101,15 @@ const EquipmentCategories = () => {
         <ScrollReveal direction="up" delay={0.2}>
           <div className={styles.header}>
             <div>
+              <p className={styles.eyebrow}>What We Offer</p>
               <h2 className={styles.title}>Equipment Categories</h2>
               <p className={styles.subtitle}>
                 High-performance machinery for diverse industrial needs
               </p>
             </div>
-            <a href="#" className={styles.viewAll}>
-              View All Categories &nbsp;→
-            </a>
+            <Link to="/products" className={styles.viewAll}>
+              View All Products &nbsp;→
+            </Link>
           </div>
         </ScrollReveal>
 

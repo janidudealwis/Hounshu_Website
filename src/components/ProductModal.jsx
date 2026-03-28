@@ -48,12 +48,9 @@ const ProductModal = ({ product, onClose }) => {
     };
   }, []);
 
-  // Generate multiple images for the product (in a real app, this would come from product data)
-  const productImages = [
-    product.image,
-    "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=500&q=80&auto=format&fit=crop",
-    "https://images.unsplash.com/photo-1581092162562-40038f56c232?w=500&q=80&auto=format&fit=crop",
-  ];
+  const productImages = product.images?.length > 0
+    ? product.images
+    : product.image ? [product.image] : [];
 
   // Technical specifications based on product type
   const getSpecifications = () => {
