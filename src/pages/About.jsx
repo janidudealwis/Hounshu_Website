@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react"; // eslint-disable-line no-unused-vars
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import ScrollProgress from "../components/ScrollProgress";
@@ -9,14 +9,10 @@ import WhatWeProvide from "../components/About/WhatWeProvide";
 import WhyChooseAbout from "../components/About/WhyChooseAbout";
 import styles from "./About.module.css";
 import SEO from "../components/SEO";
+import useScrollToTop from "../hooks/useScrollToTop";
 
 function About() {
-  // Scroll to top on component mount
-  useEffect(() => {
-    window.scrollTo(0, 0);
-    document.documentElement.scrollTop = 0;
-    document.body.scrollTop = 0;
-  }, []);
+  useScrollToTop();
 
   return (
     <LenisProvider>

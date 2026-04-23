@@ -18,6 +18,7 @@ export const PRODUCT_CATEGORIES = [
   'Special Equipment',
   'Winches',
   'Electric hoist',
+  'Wheel Loaders',
 ];
 
 export const CATEGORY_OPTIONS = [
@@ -196,5 +197,14 @@ export const CATEGORY_FIELDS = {
     { name: 'liftSpeed',       label: 'Lift Speed',          type: 'text', placeholder: 'e.g., 8 m/min',       required: false },
     { name: 'motorPower',      label: 'Motor Power',         type: 'text', placeholder: 'e.g., 0.75 kW',       required: false },
     { name: 'voltage',         label: 'Voltage',             type: 'text', placeholder: 'e.g., 380V 3-Phase',  required: false },
+  ],
+
+  'Wheel Loaders': [
+    { name: 'operatingWeight', label: 'Operating Weight',  type: 'text',   placeholder: 'e.g., 18,600 kg',       required: true,  mapTo: 'capacity' },
+    { name: 'enginePower',     label: 'Engine Power',      type: 'text',   placeholder: 'e.g., 206 kW / 276 HP', required: false },
+    { name: 'bucketCapacity',  label: 'Bucket Capacity',   type: 'text',   placeholder: 'e.g., 4.2 m³',          required: false },
+    { name: 'maxSpeed',        label: 'Max Speed',         type: 'text',   placeholder: 'e.g., 38 km/h',         required: false },
+    { name: 'transmission',    label: 'Transmission',      type: 'text',   placeholder: 'e.g., 4F/4R Auto',      required: false },
+    { name: 'fuelType',        label: 'Fuel Type',         type: 'select', options: ['Diesel', 'Petrol'],         required: false, mapTo: 'fuel_type' },
   ],
 };

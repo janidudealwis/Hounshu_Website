@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAdmin } from "../context/AdminContext";
 import { RateLimiter } from "../utils/security";
@@ -7,6 +7,7 @@ import Footer from "../components/Footer";
 import ScrollProgress from "../components/ScrollProgress";
 import { LenisProvider } from "../context/LenisContext";
 import styles from "./AdminLogin.module.css";
+import useScrollToTop from "../hooks/useScrollToTop";
 
 // Rate limiter: 5 attempts per 15 minutes
 const loginRateLimiter = new RateLimiter(5, 15 * 60 * 1000);
@@ -19,12 +20,7 @@ export default function AdminLogin() {
   const navigate = useNavigate();
   const { login } = useAdmin();
 
-  // Scroll to top on component mount
-  useEffect(() => {
-    window.scrollTo(0, 0);
-    document.documentElement.scrollTop = 0;
-    document.body.scrollTop = 0;
-  }, []);
+  useScrollToTop();
 
   const handleSubmit = async (e) => {
     e.preventDefault();

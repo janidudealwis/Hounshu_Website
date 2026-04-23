@@ -551,68 +551,236 @@
   margin: 0;
 }
 
+/* ── Mobile Filter Toggle (hidden on desktop) ───────────────────── */
+.mobileFilterToggle {
+  display: none;
+}
+
+.mobileFilterLeft {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 @media (max-width: 1024px) {
   .container {
-    grid-template-columns: 200px 1fr;
-    gap: 30px;
+    grid-template-columns: 220px 1fr;
+    gap: 28px;
   }
 
   .productsGrid {
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
     gap: 20px;
   }
 
   .pageTitle {
     font-size: 36px;
   }
+
+  .dropdown {
+    min-width: 130px;
+    padding: 10px 14px;
+  }
 }
 
 @media (max-width: 768px) {
-  .container {
-    grid-template-columns: 1fr;
+  .pageWrapper {
+    padding: 80px 0 40px;
   }
 
+  .container {
+    grid-template-columns: 1fr;
+    gap: 0;
+    padding: 0 16px;
+  }
+
+  /* Show mobile toggle button */
+  .mobileFilterToggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    background: rgba(17, 24, 17, 0.6);
+    border: 1px solid rgba(74, 222, 128, 0.18);
+    border-radius: 10px;
+    padding: 12px 16px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #4ade80;
+    cursor: pointer;
+    font-family: inherit;
+    margin-bottom: 8px;
+  }
+
+  /* Sidebar hidden by default on mobile — shown when toggle is open */
   .sidebar {
     position: static;
+    width: 100%;
+    margin-bottom: 8px;
+  }
+
+  .sidebarCollapsed {
+    display: none;
   }
 
   .filterCard {
-    border-radius: 12px;
+    border-radius: 0 0 10px 10px;
+    border-top: none;
+  }
+
+  .mobileFilterToggleOpen {
+    border-radius: 10px 10px 0 0;
+    border-bottom-color: rgba(74, 222, 128, 0.08);
   }
 
   .presetButtons {
     grid-template-columns: repeat(4, 1fr);
   }
 
-  .productsGrid {
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 16px;
+  .mainContent {
+    gap: 24px;
+  }
+
+  .header {
+    padding-bottom: 20px;
   }
 
   .pageTitle {
     font-size: 28px;
+    margin-bottom: 8px;
+  }
+
+  .pageDescription {
+    font-size: 14px;
   }
 
   .controls {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .dropdowns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .dropdown {
+    min-width: unset;
+    width: 100%;
+    font-size: 13px;
+    padding: 10px 12px;
+  }
+
+  /* Third dropdown spans full width */
+  .dropdowns .dropdown:last-child {
+    grid-column: 1 / -1;
+  }
+
+  .resultCount {
+    font-size: 13px;
+  }
+
+  .productsGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+    margin-bottom: 24px;
+  }
+
+  .productCard {
+    border-radius: 12px;
+  }
+
+  .cardContent {
+    padding: 14px;
+    gap: 8px;
+  }
+
+  .productName {
+    font-size: 14px;
+  }
+
+  .productDesc {
+    font-size: 12px;
+  }
+
+  .price {
+    font-size: 16px;
+  }
+
+  .addToCartBtn {
+    width: 36px;
+    height: 36px;
+  }
+
+  .pagination {
+    gap: 8px;
+    padding: 20px 0;
+  }
+
+  .paginationBtn {
+    width: 36px;
+    height: 36px;
+    font-size: 13px;
   }
 }
 
 @media (max-width: 480px) {
+  .pageWrapper {
+    padding: 72px 0 32px;
+  }
+
   .container {
-    padding: 0 16px;
+    padding: 0 12px;
   }
 
   .pageTitle {
-    font-size: 24px;
+    font-size: 22px;
   }
 
   .productsGrid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
   }
 
   .presetButtons {
     grid-template-columns: repeat(2, 1fr);
+  }
+
+  .dropdowns {
+    grid-template-columns: 1fr;
+  }
+
+  .dropdowns .dropdown:last-child {
+    grid-column: unset;
+  }
+
+  .cardContent {
+    padding: 12px;
+  }
+
+  .statusBadge {
+    font-size: 9px;
+    padding: 4px 8px;
+  }
+
+  .price {
+    font-size: 14px;
+  }
+
+  .addToCartBtn {
+    width: 32px;
+    height: 32px;
+  }
+
+  .pagination {
+    gap: 6px;
+  }
+
+  .paginationBtn {
+    width: 32px;
+    height: 32px;
+    font-size: 12px;
   }
 }

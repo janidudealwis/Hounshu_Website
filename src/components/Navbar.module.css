@@ -4,8 +4,9 @@
   left: 0;
   right: 0;
   z-index: 100;
-  background: rgba(10, 15, 10, 0.85);
-  backdrop-filter: blur(12px);
+  background: rgba(7, 13, 7, 0.88);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   border-bottom: 1px solid rgba(74, 222, 128, 0.08);
 }
 
@@ -19,15 +20,11 @@
   gap: 40px;
 }
 
+/* ── Logo ─────────────────────────────────────────────────────────── */
 .logo {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  text-decoration: none;
   flex-shrink: 0;
 }
 
-.logo,
 .logo a {
   display: flex;
   align-items: center;
@@ -36,7 +33,7 @@
 }
 
 .logoImg {
-  height: 40px;
+  height: 38px;
   width: auto;
   object-fit: contain;
   flex-shrink: 0;
@@ -57,19 +54,22 @@
 }
 
 .logoEnterprises {
-  color: #4ade80;
+  color: #f0f4f0;
 }
 
+/* ── Nav Links ────────────────────────────────────────────────────── */
 .navLinks {
   display: flex;
   align-items: center;
   gap: 32px;
   list-style: none;
+  margin: 0;
+  padding: 0;
   margin-left: auto;
 }
 
 .navLinks a {
-  color: #b0c4b0;
+  color: #a0b8a0;
   text-decoration: none;
   font-size: 14px;
   font-weight: 450;
@@ -81,6 +81,15 @@
   color: #f0f4f0;
 }
 
+/* ── Right Actions (CTA + Cart + Hamburger) ───────────────────────── */
+.rightActions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+/* ── Desktop CTA Button ───────────────────────────────────────────── */
 .ctaBtn {
   background: #22c55e;
   color: #000;
@@ -93,14 +102,12 @@
   letter-spacing: -0.02em;
   cursor: pointer;
   white-space: nowrap;
-  transition:
-    background 0.2s,
-    transform 0.15s;
-  flex-shrink: 0;
+  transition: background 0.2s, transform 0.15s;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   text-decoration: none;
+  flex-shrink: 0;
 }
 
 .ctaBtn:hover {
@@ -108,86 +115,227 @@
   transform: translateY(-1px);
 }
 
-.hamburger {
-  display: none;
-  flex-direction: column;
-  gap: 5px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 4px;
-  margin-left: auto;
-}
-
-.hamburger span {
-  display: block;
-  width: 22px;
-  height: 2px;
-  background: #f0f4f0;
-  border-radius: 2px;
-  transition: 0.3s;
-}
-
+/* ── Cart Icon ────────────────────────────────────────────────────── */
 .cartIcon {
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
-  color: #f0f4f0;
+  color: #c0d4c0;
   text-decoration: none;
-  width: 40px;
-  height: 40px;
-  border-radius: 8px;
-  background: rgba(74, 222, 128, 0.1);
-  transition: all 0.3s ease;
+  width: 38px;
+  height: 38px;
+  border-radius: 9px;
+  background: rgba(74, 222, 128, 0.07);
+  border: 1px solid rgba(74, 222, 128, 0.14);
+  transition: all 0.2s ease;
+  flex-shrink: 0;
 }
 
 .cartIcon:hover {
-  background: rgba(74, 222, 128, 0.2);
+  background: rgba(74, 222, 128, 0.14);
+  border-color: rgba(74, 222, 128, 0.3);
   color: #4ade80;
-}
-
-.cartIcon svg {
-  width: 20px;
-  height: 20px;
 }
 
 .cartBadge {
   position: absolute;
-  top: -8px;
-  right: -8px;
-  background: #00d97e;
-  color: #0f1419;
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
+  top: -5px;
+  right: -5px;
+  background: #22c55e;
+  color: #060c06;
+  min-width: 17px;
+  height: 17px;
+  border-radius: 9px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 12px;
-  font-weight: 700;
+  font-size: 9px;
+  font-weight: 800;
+  padding: 0 3px;
+  border: 2px solid #070d07;
+  line-height: 1;
 }
 
+/* ── Hamburger ────────────────────────────────────────────────────── */
+.hamburger {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  background: rgba(74, 222, 128, 0.07);
+  border: 1px solid rgba(74, 222, 128, 0.14);
+  border-radius: 9px;
+  cursor: pointer;
+  padding: 0;
+  width: 38px;
+  height: 38px;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.hamburger span {
+  display: block;
+  width: 18px;
+  height: 2px;
+  background: #c0d4c0;
+  border-radius: 2px;
+  transition: transform 0.28s ease, opacity 0.2s ease;
+}
+
+/* Hamburger → X animation */
+.hamburgerOpen span:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+.hamburgerOpen span:nth-child(2) {
+  opacity: 0;
+  transform: scaleX(0);
+}
+.hamburgerOpen span:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+/* ── Mobile-only items (hidden on desktop) ────────────────────────── */
+.mobileOnly {
+  display: none;
+}
+
+.mobileCtaBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #22c55e;
+  color: #000 !important;
+  border-radius: 10px;
+  padding: 18px 20px;
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+  width: 100%;
+  text-align: center;
+  transition: background 0.2s;
+  box-shadow: 0 0 20px rgba(34, 197, 94, 0.18);
+}
+
+.mobileCtaBtn:hover {
+  background: #4ade80;
+}
+
+/* ── Mobile ───────────────────────────────────────────────────────── */
 @media (max-width: 768px) {
+  .container {
+    gap: 0;
+    padding: 0 16px;
+  }
+
+  /* Show hamburger */
+  .hamburger {
+    display: flex;
+  }
+
+  /* Hide desktop CTA */
+  .ctaBtn {
+    display: none;
+  }
+
+  /* Push right actions to the far right */
+  .rightActions {
+    gap: 8px;
+    margin-left: auto;
+  }
+
+  /* Dropdown panel */
   .navLinks {
     display: none;
     position: absolute;
     top: 64px;
     left: 0;
     right: 0;
-    background: rgba(10, 15, 10, 0.97);
     flex-direction: column;
-    padding: 24px;
-    gap: 20px;
+    gap: 0;
+    margin: 0;
+    padding: 6px 16px 20px;
+    background: rgba(4, 8, 4, 0.98);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
     border-bottom: 1px solid rgba(74, 222, 128, 0.1);
+    box-shadow: 0 20px 48px rgba(0, 0, 0, 0.7);
   }
+
   .navLinks.open {
     display: flex;
   }
-  .hamburger {
-    display: flex;
+
+  .navLinks li {
+    width: 100%;
   }
-  .ctaBtn {
-    display: none;
+
+  /* Nav link items */
+  .navLinks a {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px 2px;
+    font-family: "Space Grotesk", sans-serif;
+    font-size: 17px;
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    color: #8aaa8a;
+    border-bottom: 1px solid rgba(74, 222, 128, 0.06);
+    transition: color 0.18s, padding-left 0.18s;
+  }
+
+  .navLinks a::after {
+    content: '→';
+    font-size: 14px;
+    opacity: 0;
+    transform: translateX(-6px);
+    transition: opacity 0.18s, transform 0.18s;
+    color: #4ade80;
+  }
+
+  .navLinks a:hover {
+    color: #f0f4f0;
+    padding-left: 6px;
+  }
+
+  .navLinks a:hover::after {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  .navLinks li:last-of-type > a:not(.mobileCtaBtn) {
+    border-bottom: none;
+  }
+
+  /* Contact Us — bottom of menu */
+  .mobileOnly {
+    display: block;
+    padding: 16px 0 0;
+    margin-top: 4px;
+  }
+
+  .mobileOnly a {
+    border-bottom: none !important;
+    padding: 0 !important;
+    font-family: "Inter", sans-serif !important;
+    font-size: 14px !important;
+    font-weight: 700 !important;
+    letter-spacing: -0.01em !important;
+    justify-content: center !important;
+  }
+
+  .mobileOnly a::after {
+    display: none !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .logoText {
+    font-size: 15px;
+  }
+
+  .logoImg {
+    height: 32px;
   }
 }

@@ -9,6 +9,7 @@ import { useCart } from "../context/CartContext";
 import { supabase } from "../lib/supabase";
 import styles from "./ProductDetail.module.css";
 import SEO from "../components/SEO";
+import useScrollToTop from "../hooks/useScrollToTop";
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -43,11 +44,10 @@ const ProductDetail = () => {
     fetchProduct();
   }, [id]);
 
-  // Scroll to top when product ID changes
+  useScrollToTop([id]);
+
+  // Reset cart state when product changes
   useEffect(() => {
-    window.scrollTo(0, 0);
-    document.documentElement.scrollTop = 0;
-    document.body.scrollTop = 0;
     setAddedToCart(false);
   }, [id]);
 
@@ -270,12 +270,6 @@ const ProductDetail = () => {
               </div>
 
               <div className={styles.actionSection}>
-                <div className={styles.priceInfo}>
-                  <span className={styles.startingAt}>STARTING AT</span>
-                  <span className={styles.price}>
-                    LKR {product.price.toLocaleString()}
-                  </span>
-                </div>
                 <button
                   className={`${styles.quoteBtn} ${addedToCart ? styles.added : ""}`}
                   onClick={() => {

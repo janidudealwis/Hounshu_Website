@@ -85,11 +85,14 @@
 }
 
 .card {
+  display: block;
   position: relative;
   border-radius: 18px;
   overflow: hidden;
   aspect-ratio: 3/4;
   cursor: pointer;
+  text-decoration: none;
+  color: inherit;
   transition: transform 0.4s var(--ease-expo), box-shadow 0.4s ease;
 }
 

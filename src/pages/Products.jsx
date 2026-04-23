@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect } from "react";
+import useScrollToTop from "../hooks/useScrollToTop";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
@@ -20,23 +21,21 @@ const Products = () => {
   const [products, setProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedBrand, setSelectedBrand] = useState("All");
-  const [selectedCapacity, setSelectedCapacity] = useState("All");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [currentPage, setCurrentPage] = useState(1);
   const [addedToCart, setAddedToCart] = useState(null);
+  const [filtersOpen, setFiltersOpen] = useState(false);
+
+  useScrollToTop();
 
   // Fetch products from Supabase
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         setIsLoading(true);
-        console.log("Starting to fetch products...");
 
-        // Check if Supabase is available
         if (!supabase) {
-          console.log("Supabase not available, using mock products data");
           setProducts(MOCK_PRODUCTS);
-          console.log("Mock products set:", MOCK_PRODUCTS);
           return;
         }
 
@@ -46,49 +45,28 @@ const Products = () => {
           .order("created_at", { ascending: false });
 
         if (error) throw error;
-        console.log("Supabase data fetched:", data);
         setProducts(data || []);
       } catch (err) {
-        console.error("Error fetching products from Supabase:", err);
-        console.log("Using mock products data as fallback");
-        // Use mock data as fallback when Supabase is not available
+        console.error("Error fetching products:", err);
         setProducts(MOCK_PRODUCTS);
-        console.log("Fallback products set:", MOCK_PRODUCTS);
       } finally {
         setIsLoading(false);
-        console.log("Loading finished");
       }
     };
 
     fetchProducts();
   }, []);
 
-  // Scroll to top on component mount
-  useEffect(() => {
-    window.scrollTo(0, 0);
-    document.documentElement.scrollTop = 0;
-    document.body.scrollTop = 0;
-  }, []);
-
   const brands = ["All", ...new Set(products.map((p) => p.brand))];
-  const capacities = ["All", ...new Set(products.map((p) => p.capacity))];
   const categories = ["All", ...PRODUCT_CATEGORIES];
 
   const filteredProducts = useMemo(() => {
-    const filtered = products.filter((product) => {
-      const brandMatch =
-        selectedBrand === "All" || product.brand === selectedBrand;
-      const capacityMatch =
-        selectedCapacity === "All" || product.capacity === selectedCapacity;
-      const categoryMatch =
-        selectedCategory === "All" || product.category === selectedCategory;
-      return brandMatch && capacityMatch && categoryMatch;
+    return products.filter((product) => {
+      const brandMatch = selectedBrand === "All" || product.brand === selectedBrand;
+      const categoryMatch = selectedCategory === "All" || product.category === selectedCategory;
+      return brandMatch && categoryMatch;
     });
-    console.log("Filtered products:", filtered);
-    console.log("Products count:", products.length);
-    console.log("Filtered count:", filtered.length);
-    return filtered;
-  }, [products, selectedBrand, selectedCapacity, selectedCategory]);
+  }, [products, selectedBrand, selectedCategory]);
 
   const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -129,9 +107,6 @@ const Products = () => {
     setTimeout(() => setAddedToCart(null), 2000);
   };
 
-  // Debug logs
-  console.log("Component render - isLoading:", isLoading, "products.length:", products.length, "filteredProducts.length:", filteredProducts.length, "paginatedProducts.length:", paginatedProducts.length);
-
   return (
     <LenisProvider>
       <SEO
@@ -144,9 +119,33 @@ const Products = () => {
       <main className={styles.pageWrapper}>
         <ScrollReveal direction="fade" delay={0.2}>
           <div className={styles.container}>
+            {/* Mobile Filter Toggle */}
+            <button
+              className={`${styles.mobileFilterToggle} ${filtersOpen ? styles.mobileFilterToggleOpen : ""}`}
+              onClick={() => setFiltersOpen(!filtersOpen)}
+            >
+              <span className={styles.mobileFilterLeft}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4ade80" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
+                </svg>
+                <span>Filters</span>
+                {(selectedBrand !== "All" || selectedCategory !== "All") && (
+                  <span className={styles.activeCount}>
+                    {[selectedBrand, selectedCategory].filter(v => v !== "All").length}
+                  </span>
+                )}
+              </span>
+              <svg
+                width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+                style={{ transform: filtersOpen ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.25s" }}
+              >
+                <polyline points="6 9 12 15 18 9" />
+              </svg>
+            </button>
+
             {/* Sidebar */}
             <ScrollReveal direction="left" delay={0.4}>
-              <aside className={styles.sidebar}>
+              <aside className={`${styles.sidebar} ${!filtersOpen ? styles.sidebarCollapsed : ""}`}>
                 <div className={styles.filterCard}>
 
                   {/* Filter Header */}
@@ -156,18 +155,17 @@ const Products = () => {
                         <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
                       </svg>
                       <span className={styles.filterTitle}>Filters</span>
-                      {(selectedBrand !== "All" || selectedCapacity !== "All" || selectedCategory !== "All") && (
+                      {(selectedBrand !== "All" || selectedCategory !== "All") && (
                         <span className={styles.activeCount}>
-                          {[selectedBrand, selectedCapacity, selectedCategory].filter(v => v !== "All").length}
+                          {[selectedBrand, selectedCategory].filter(v => v !== "All").length}
                         </span>
                       )}
                     </div>
-                    {(selectedBrand !== "All" || selectedCapacity !== "All" || selectedCategory !== "All") && (
+                    {(selectedBrand !== "All" || selectedCategory !== "All") && (
                       <button
                         className={styles.clearAll}
                         onClick={() => {
                           setSelectedBrand("All");
-                          setSelectedCapacity("All");
                           setSelectedCategory("All");
                           setCurrentPage(1);
                         }}
@@ -225,43 +223,17 @@ const Products = () => {
 
                     <div className={styles.divider} />
 
-                    {/* Capacity */}
-                    <div className={styles.filterGroup}>
-                      <div className={styles.filterGroupHeader}>
-                        <span className={styles.filterLabel}>Power / Capacity</span>
-                        {selectedCapacity !== "All" && (
-                          <button className={styles.clearOne} onClick={() => { setSelectedCapacity("All"); setCurrentPage(1); }}>✕</button>
-                        )}
-                      </div>
-                      <div className={styles.filterChips}>
-                        {capacities.map((capacity) => (
-                          <button
-                            key={capacity}
-                            className={`${styles.chip} ${selectedCapacity === capacity ? styles.chipActive : ""}`}
-                            onClick={() => { setSelectedCapacity(capacity); setCurrentPage(1); }}
-                          >
-                            {capacity}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div className={styles.divider} />
-
                     {/* Quick Presets */}
                     <div className={styles.filterGroup}>
                       <span className={styles.filterLabel}>Quick Presets</span>
                       <div className={styles.presetButtons}>
-                        <button className={styles.presetBtn} onClick={() => { setSelectedBrand("Denyo"); setSelectedCapacity("All"); setSelectedCategory("All"); setCurrentPage(1); }}>
+                        <button className={styles.presetBtn} onClick={() => { setSelectedBrand("Denyo"); setSelectedCategory("All"); setCurrentPage(1); }}>
                           Denyo
                         </button>
-                        <button className={styles.presetBtn} onClick={() => { setSelectedBrand("Cummins"); setSelectedCapacity("All"); setSelectedCategory("All"); setCurrentPage(1); }}>
+                        <button className={styles.presetBtn} onClick={() => { setSelectedBrand("Cummins"); setSelectedCategory("All"); setCurrentPage(1); }}>
                           Cummins
                         </button>
-                        <button className={styles.presetBtn} onClick={() => { setSelectedBrand("All"); setSelectedCapacity("25KVA"); setSelectedCategory("All"); setCurrentPage(1); }}>
-                          25 KVA
-                        </button>
-                        <button className={styles.presetBtn} onClick={() => { setSelectedBrand("Honshu"); setSelectedCapacity("All"); setSelectedCategory("All"); setCurrentPage(1); }}>
+                        <button className={styles.presetBtn} onClick={() => { setSelectedBrand("Honshu"); setSelectedCategory("All"); setCurrentPage(1); }}>
                           Honshu
                         </button>
                       </div>
@@ -302,22 +274,7 @@ const Products = () => {
                     </option>
                   ))}
                 </select>
-                <select
-                  className={styles.dropdown}
-                  value={selectedCapacity}
-                  onChange={(e) => {
-                    setSelectedCapacity(e.target.value);
-                    setCurrentPage(1);
-                  }}
-                >
-                  <option value="All">All Capacities</option>
-                  {capacities.slice(1).map((capacity) => (
-                    <option key={capacity} value={capacity}>
-                      {capacity}
-                    </option>
-                  ))}
-                </select>
-                <select
+<select
                   className={styles.dropdown}
                   value={selectedCategory}
                   onChange={(e) => {
@@ -355,7 +312,6 @@ const Products = () => {
               </div>
             ) : (
               <>
-                {console.log("About to render products grid with", paginatedProducts.length, "products")}
                 {/* Products Grid */}
                   <div className={styles.productsGrid}>
                     {paginatedProducts.map((product) => (
@@ -384,11 +340,7 @@ const Products = () => {
                         </p>
 
                         <div className={styles.priceSection}>
-                          <span className={styles.startingAt}>Starting at</span>
                           <div className={styles.priceRow}>
-                            <span className={styles.price}>
-                              LKR {product.price.toLocaleString()}
-                            </span>
                             <button
                               className={`${styles.addToCartBtn} ${addedToCart === product.id ? styles.added : ""}`}
                               onClick={(e) => handleAddToCart(product, e)}

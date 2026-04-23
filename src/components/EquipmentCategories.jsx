@@ -117,7 +117,7 @@ const EquipmentCategories = () => {
           <div className={styles.grid}>
             {categories.map((cat, index) => (
               <ScrollReveal key={cat.id} direction="up" delay={0.6 + index * 0.1}>
-                <div className={styles.card}>
+                <Link to="/products" className={styles.card}>
                   <img
                     src={cat.img}
                     alt={cat.title}
@@ -130,7 +130,7 @@ const EquipmentCategories = () => {
                     <h3 className={styles.cardTitle}>{cat.title}</h3>
                     <p className={styles.cardDesc}>{cat.desc}</p>
                   </div>
-                </div>
+                </Link>
               </ScrollReveal>
             ))}
           </div>

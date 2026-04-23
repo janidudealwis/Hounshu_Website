@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import ScrollProgress from "../components/ScrollProgress";
@@ -8,6 +8,7 @@ import { LenisProvider } from "../context/LenisContext";
 import { sanitizeInput, isValidEmail, isValidLength } from "../utils/security";
 import styles from "./Contact.module.css";
 import SEO from "../components/SEO";
+import useScrollToTop from "../hooks/useScrollToTop";
 
 function Contact() {
   const [formData, setFormData] = useState({
@@ -21,12 +22,7 @@ function Contact() {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
 
-  // Scroll to top on component mount
-  useEffect(() => {
-    window.scrollTo(0, 0);
-    document.documentElement.scrollTop = 0;
-    document.body.scrollTop = 0;
-  }, []);
+  useScrollToTop();
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;

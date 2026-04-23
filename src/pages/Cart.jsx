@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
@@ -11,6 +11,7 @@ import { supabase } from "../lib/supabase";
 import { sanitizeInput, isValidPhone, isValidLength } from "../utils/security";
 import styles from "./Cart.module.css";
 import SEO from "../components/SEO";
+import useScrollToTop from "../hooks/useScrollToTop";
 
 const Cart = () => {
   const navigate = useNavigate();
@@ -19,7 +20,6 @@ const Cart = () => {
     removeFromCart,
     updateQuantity,
     clearCart,
-    getTotalPrice,
   } = useCart();
   const [customerName, setCustomerName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -28,10 +28,7 @@ const Cart = () => {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
 
-  // Scroll to top on component mount
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
+  useScrollToTop();
 
   const handleCheckout = async () => {
     // Enhanced Validation
@@ -51,12 +48,6 @@ const Cart = () => {
       const sanitizedName = sanitizeInput(customerName.trim());
       const sanitizedPhone = sanitizeInput(phoneNumber.trim());
 
-      // Calculate totals
-      const subtotal = getTotalPrice();
-      const tax = subtotal * 0.1;
-      const shipping = subtotal > 10000 ? 0 : 500;
-      const total = subtotal + tax + shipping;
-
       // 1. Insert order into orders table
       const { data: orderData, error: orderError } = await supabase
         .from("orders")
@@ -64,9 +55,6 @@ const Cart = () => {
           {
             customer_name: sanitizedName,
             phone: sanitizedPhone,
-            subtotal: subtotal,
-            tax: Math.round(tax),
-            total: Math.round(total),
           },
         ])
         .select("id");
@@ -80,7 +68,6 @@ const Cart = () => {
         order_id: orderId,
         product_id: item.id,
         product_name: sanitizeInput(item.name),
-        price: item.price,
         quantity: item.quantity,
       }));
 
@@ -90,7 +77,7 @@ const Cart = () => {
 
       if (itemsError) throw new Error(itemsError.message);
 
-      // 3. Generate WhatsApp message with sanitized data
+      // 3. Generate WhatsApp message
       const itemsList = cartItems
         .map((item) => `• ${sanitizeInput(item.name)} × ${item.quantity}`)
         .join("\n");
@@ -102,9 +89,7 @@ Order ID: ${orderId}
 Items:
 ${itemsList}
 
-Subtotal: $${subtotal.toLocaleString()}
-Tax: $${Math.round(tax).toLocaleString()}
-Total: $${Math.round(total).toLocaleString()}`;
+Please contact us for pricing and availability.`;
 
       // 4. Encode message
       const encodedMessage = encodeURIComponent(message);
@@ -178,12 +163,6 @@ Total: $${Math.round(total).toLocaleString()}`;
     );
   }
 
-  const totalPrice = getTotalPrice();
-  const subtotal = totalPrice;
-  const tax = subtotal * 0.1; // 10% tax
-  const shipping = subtotal > 10000 ? 0 : 500;
-  const total = subtotal + tax + shipping;
-
   return (
     <LenisProvider>
       <SEO title="Your Cart" noindex={true} />
@@ -223,9 +202,6 @@ Total: $${Math.round(total).toLocaleString()}`;
                   <div className={styles.itemDetails}>
                     <h3 className={styles.itemName}>{item.name}</h3>
                     <p className={styles.itemSeries}>{item.series}</p>
-                    <p className={styles.itemPrice}>
-                      ${item.price.toLocaleString()}
-                    </p>
                   </div>
 
                   <div className={styles.itemQuantity}>
@@ -240,10 +216,6 @@ Total: $${Math.round(total).toLocaleString()}`;
                     >
                       +
                     </button>
-                  </div>
-
-                  <div className={styles.itemTotal}>
-                    ${(item.price * item.quantity).toLocaleString()}
                   </div>
 
                   <button
@@ -265,31 +237,10 @@ Total: $${Math.round(total).toLocaleString()}`;
               <h2 className={styles.summaryTitle}>Order Summary</h2>
 
               <div className={styles.summaryRow}>
-                <span>Subtotal ({cartItems.length} items)</span>
-                <span>${subtotal.toLocaleString()}</span>
-              </div>
-
-              <div className={styles.summaryRow}>
-                <span>Tax (10%)</span>
-                <span>${tax.toFixed(0).toLocaleString()}</span>
-              </div>
-
-              <div className={styles.summaryRow}>
-                <span>
-                  Shipping
-                  {shipping === 0 && (
-                    <span className={styles.free}> (FREE)</span>
-                  )}
-                </span>
-                <span>${shipping.toLocaleString()}</span>
+                <span>{cartItems.length} item{cartItems.length !== 1 ? "s" : ""} selected</span>
               </div>
 
               <div className={styles.divider}></div>
-
-              <div className={styles.summaryRow + " " + styles.total}>
-                <span>Total</span>
-                <span>${total.toFixed(0).toLocaleString()}</span>
-              </div>
 
               {!showCheckoutForm ? (
                 <button
