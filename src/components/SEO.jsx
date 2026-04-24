@@ -33,6 +33,7 @@ export default function SEO({
       {canonicalUrl && <meta property="og:url" content={canonicalUrl} />}
       <meta property="og:image" content={image} />
       <meta property="og:site_name" content={SITE_NAME} />
+      <meta property="og:locale" content="en_LK" />
 
       {/* Twitter Card */}
       <meta name="twitter:card" content="summary_large_image" />

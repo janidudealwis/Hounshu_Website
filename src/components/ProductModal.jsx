@@ -114,6 +114,7 @@ const ProductModal = ({ product, onClose }) => {
                 src={productImages[selectedImageIndex]}
                 alt={product.name}
                 className={styles.mainImage}
+                loading="lazy"
               />
               {product.status && (
                 <span className={styles.statusBadge}>{product.status}</span>
@@ -130,7 +131,7 @@ const ProductModal = ({ product, onClose }) => {
                   }`}
                   onClick={() => setSelectedImageIndex(index)}
                 >
-                  <img src={image} alt={`View ${index + 1}`} />
+                  <img src={image} alt={`View ${index + 1}`} loading="lazy" />
                 </button>
               ))}
             </div>

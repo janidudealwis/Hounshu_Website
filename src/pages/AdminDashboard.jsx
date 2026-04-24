@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAdmin } from "../context/AdminContext";
+import useScrollToTop from "../hooks/useScrollToTop";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import ScrollProgress from "../components/ScrollProgress";
@@ -20,14 +21,13 @@ export default function AdminDashboard() {
   const [error, setError] = useState("");
   const [search, setSearch] = useState("");
 
+  useScrollToTop();
+
   useEffect(() => {
     if (!isAdminLoggedIn) {
       navigate("/admin/login");
       return;
     }
-    window.scrollTo(0, 0);
-    document.documentElement.scrollTop = 0;
-    document.body.scrollTop = 0;
     fetchProducts();
   }, [isAdminLoggedIn, navigate]);
 
@@ -36,7 +36,7 @@ export default function AdminDashboard() {
       setIsLoading(true);
       const { data, error } = await supabase
         .from("products")
-        .select("*")
+        .select("id, name, brand, series, category, capacity, status, price, image")
         .order("created_at", { ascending: false });
 
       if (error) throw error;
@@ -50,27 +50,27 @@ export default function AdminDashboard() {
     }
   };
 
-  const handleProductAdded = () => {
+  const handleProductAdded = useCallback(() => {
     setShowAddForm(false);
     fetchProducts();
-  };
+  }, []);
 
-  const handleEditProduct = (product) => {
+  const handleEditProduct = useCallback((product) => {
     setEditingProduct(product);
     setShowAddForm(false);
     window.scrollTo({ top: 0, behavior: "smooth" });
-  };
+  }, []);
 
-  const handleProductUpdated = () => {
+  const handleProductUpdated = useCallback(() => {
     setEditingProduct(null);
     fetchProducts();
-  };
+  }, []);
 
-  const handleCancelEdit = () => {
+  const handleCancelEdit = useCallback(() => {
     setEditingProduct(null);
-  };
+  }, []);
 
-  const handleDeleteProduct = async (productId) => {
+  const handleDeleteProduct = useCallback(async (productId) => {
     if (!window.confirm("Are you sure you want to delete this product?")) return;
     try {
       const { error } = await supabase
@@ -78,30 +78,30 @@ export default function AdminDashboard() {
         .delete()
         .eq("id", productId);
       if (error) throw error;
-      setProducts(products.filter((p) => p.id !== productId));
-    } catch (err) {
-      console.error("Error deleting product:", err);
+      setProducts((prev) => prev.filter((p) => p.id !== productId));
+    } catch {
       setError("Failed to delete product");
     }
-  };
+  }, []);
 
-  const handleLogout = () => {
+  const handleLogout = useCallback(() => {
     logout();
     navigate("/");
-  };
+  }, [logout, navigate]);
 
-  const categories = [...new Set(products.map((p) => p.category).filter(Boolean))];
-  const inStockCount = products.filter((p) => p.status === "IN STOCK").length;
-
-  const filteredProducts = products.filter((p) => {
+  const { categories, inStockCount, filteredProducts } = useMemo(() => {
     const q = search.toLowerCase();
-    return (
-      p.name?.toLowerCase().includes(q) ||
-      p.brand?.toLowerCase().includes(q) ||
-      p.category?.toLowerCase().includes(q) ||
-      p.series?.toLowerCase().includes(q)
-    );
-  });
+    return {
+      categories: [...new Set(products.map((p) => p.category).filter(Boolean))],
+      inStockCount: products.filter((p) => p.status === "IN STOCK").length,
+      filteredProducts: products.filter((p) =>
+        p.name?.toLowerCase().includes(q) ||
+        p.brand?.toLowerCase().includes(q) ||
+        p.category?.toLowerCase().includes(q) ||
+        p.series?.toLowerCase().includes(q),
+      ),
+    };
+  }, [products, search]);
 
   return (
     <LenisProvider>
@@ -228,7 +228,7 @@ export default function AdminDashboard() {
                         <td>
                           <div className={styles.productCell}>
                             {product.image ? (
-                              <img src={product.image} alt={product.name} className={styles.thumb} />
+                              <img src={product.image} alt={product.name} className={styles.thumb} loading="lazy" />
                             ) : (
                               <div className={styles.thumbPlaceholder}>
                                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4ade80" strokeWidth="1.5">

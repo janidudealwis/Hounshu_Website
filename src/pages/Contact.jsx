@@ -62,7 +62,7 @@ function Contact() {
       const sanitizedService = sanitizeInput(formData.serviceInterest);
 
       const res = await fetch(
-        "https://pdhrnnyjdipfhdrjihkq.supabase.co/functions/v1/send-email",
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-email`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

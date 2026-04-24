@@ -169,7 +169,7 @@ const ProductDetail = () => {
                     }`}
                     onClick={() => setSelectedImageIndex(index)}
                   >
-                    <img src={image} alt={`View ${index + 1}`} />
+                    <img src={image} alt={`View ${index + 1}`} loading="lazy" />
                   </button>
                 ))}
               </div>

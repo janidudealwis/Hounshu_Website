@@ -3,8 +3,7 @@ import ScrollReveal from "./ScrollReveal";
 import SuccessModal from "./SuccessModal";
 import styles from "./CTA.module.css";
 
-const EDGE_FN_URL =
-  "https://pdhrnnyjdipfhdrjihkq.supabase.co/functions/v1/send-email";
+const EDGE_FN_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-email`;
 
 const CTA = () => {
   const [email, setEmail] = useState("");

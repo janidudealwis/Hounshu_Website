@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo, useCallback, useEffect } from "react";
 import useScrollToTop from "../hooks/useScrollToTop";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
@@ -41,7 +41,7 @@ const Products = () => {
 
         const { data, error } = await supabase
           .from("products")
-          .select("*")
+          .select("id, name, brand, series, category, description, image, status, price")
           .order("created_at", { ascending: false });
 
         if (error) throw error;
@@ -57,8 +57,11 @@ const Products = () => {
     fetchProducts();
   }, []);
 
-  const brands = ["All", ...new Set(products.map((p) => p.brand))];
-  const categories = ["All", ...PRODUCT_CATEGORIES];
+  const brands = useMemo(
+    () => ["All", ...new Set(products.map((p) => p.brand).filter(Boolean))],
+    [products],
+  );
+  const categories = useMemo(() => ["All", ...PRODUCT_CATEGORIES], []);
 
   const filteredProducts = useMemo(() => {
     return products.filter((product) => {
@@ -68,19 +71,16 @@ const Products = () => {
     });
   }, [products, selectedBrand, selectedCategory]);
 
-  const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE);
-  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-  const paginatedProducts = filteredProducts.slice(
-    startIndex,
-    startIndex + ITEMS_PER_PAGE,
-  );
+  const { totalPages, paginatedProducts } = useMemo(() => {
+    const total = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE);
+    const start = (currentPage - 1) * ITEMS_PER_PAGE;
+    return {
+      totalPages: total,
+      paginatedProducts: filteredProducts.slice(start, start + ITEMS_PER_PAGE),
+    };
+  }, [filteredProducts, currentPage]);
 
-  const handlePageChange = (page) => {
-    setCurrentPage(page);
-    window.scrollTo({ top: 400, behavior: "smooth" });
-  };
-
-  const getPaginationPages = () => {
+  const paginationPages = useMemo(() => {
     const pages = [];
     if (totalPages <= 7) {
       for (let i = 1; i <= totalPages; i++) pages.push(i);
@@ -98,14 +98,19 @@ const Products = () => {
       pages.push(totalPages);
     }
     return pages;
-  };
+  }, [totalPages, currentPage]);
 
-  const handleAddToCart = (product, e) => {
+  const handlePageChange = useCallback((page) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 400, behavior: "smooth" });
+  }, []);
+
+  const handleAddToCart = useCallback((product, e) => {
     e.stopPropagation();
     addToCart(product, 1);
     setAddedToCart(product.id);
     setTimeout(() => setAddedToCart(null), 2000);
-  };
+  }, [addToCart]);
 
   return (
     <LenisProvider>
@@ -326,6 +331,7 @@ const Products = () => {
                           src={product.image}
                           alt={product.name}
                           className={styles.productImage}
+                          loading="lazy"
                         />
                         <span className={styles.statusBadge}>
                           {product.status}
@@ -380,7 +386,7 @@ const Products = () => {
                     ←
                   </button>
 
-                  {getPaginationPages().map((page, index) =>
+                  {paginationPages.map((page, index) =>
                     page === "..." ? (
                       <span
                         key={`ellipsis-${index}`}

@@ -130,6 +130,7 @@ const Hero = () => {
                           src={product.image}
                           alt={product.name}
                           className={styles.cardImg}
+                          loading="lazy"
                         />
                       </div>
 

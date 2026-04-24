@@ -8,6 +8,7 @@ import ScrollProgress from "../components/ScrollProgress";
 import { LenisProvider } from "../context/LenisContext";
 import styles from "./AdminLogin.module.css";
 import useScrollToTop from "../hooks/useScrollToTop";
+import SEO from "../components/SEO";
 
 // Rate limiter: 5 attempts per 15 minutes
 const loginRateLimiter = new RateLimiter(5, 15 * 60 * 1000);
@@ -61,6 +62,7 @@ export default function AdminLogin() {
 
   return (
     <LenisProvider>
+      <SEO title="Admin Login" noindex={true} />
       <ScrollProgress />
       <Navbar />
       <div className={styles.wrapper}>

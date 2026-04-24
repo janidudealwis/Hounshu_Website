@@ -196,7 +196,7 @@ Please contact us for pricing and availability.`;
                       >
                         <div className={styles.cartItem}>
                   <div className={styles.itemImage}>
-                    <img src={item.image} alt={item.name} />
+                    <img src={item.image} alt={item.name} loading="lazy" />
                   </div>
 
                   <div className={styles.itemDetails}>

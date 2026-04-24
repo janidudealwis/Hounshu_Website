@@ -44,9 +44,9 @@ const WhyChooseAbout = () => {
                       "Industry-leading security protocols",
                       "24/7 dedicated support team",
                       "Sustainable and ethical business practices",
-                    ].map((item, index) => (
+                    ].map((item) => (
                       <ScrollReveal
-                        key={index}
+                        key={item}
                         direction="right"
                         delay={1.2 + (index * 0.2)}
                       >

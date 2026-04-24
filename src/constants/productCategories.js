@@ -21,24 +21,6 @@ export const PRODUCT_CATEGORIES = [
   'Wheel Loaders',
 ];
 
-export const CATEGORY_OPTIONS = [
-  { value: '', label: 'All Categories' },
-  ...PRODUCT_CATEGORIES.map((c) => ({ value: c, label: c })),
-];
-
-/**
- * Per-category field definitions for the product form.
- *
- * Each field:
- *   name        — key used in state and stored in the `specs` JSONB column
- *   label       — display label
- *   type        — 'text' | 'number' | 'select'
- *   placeholder — hint text (text/number only)
- *   options     — array of strings (select only)
- *   required    — true = must be filled before submitting
- *   mapTo       — if present, value is saved to this top-level DB column
- *                 ('capacity' or 'fuel_type') instead of into `specs`
- */
 export const CATEGORY_FIELDS = {
   'Generators (Diesel)': [
     { name: 'powerOutput',   label: 'Power Output (KVA)',  type: 'text',   placeholder: 'e.g., 25 KVA',        required: true,  mapTo: 'capacity'  },
