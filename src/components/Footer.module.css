@@ -12,8 +12,8 @@
 
 .top {
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1.4fr;
-  gap: 48px;
+  grid-template-columns: 2fr 1fr 1fr 1.3fr 1.3fr;
+  gap: 40px;
   padding-bottom: 48px;
 }
 
@@ -124,6 +124,17 @@
   color: #c0dcc0;
 }
 
+/* Office labels */
+.officeLabel {
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #4ade80;
+  margin-top: 4px;
+  margin-bottom: -8px;
+}
+
 /* HQ column */
 .address {
   font-size: 13.5px;
@@ -196,7 +207,16 @@
   color: #8aba8a;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 1100px) {
+  .top {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+  .brand {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 700px) {
   .top {
     grid-template-columns: 1fr 1fr;
   }

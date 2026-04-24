@@ -35,7 +35,6 @@ function Contact() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Enhanced Validation
     if (!isValidLength(formData.firstName, 2, 50)) {
       alert("First name must be between 2 and 50 characters");
       return;
@@ -56,35 +55,30 @@ function Contact() {
     setIsSubmitting(true);
 
     try {
-      // Sanitize all inputs to prevent XSS
       const sanitizedFirstName = sanitizeInput(formData.firstName.trim());
       const sanitizedLastName = sanitizeInput(formData.lastName.trim());
       const sanitizedEmail = sanitizeInput(formData.email.trim());
       const sanitizedMessage = sanitizeInput(formData.message.trim());
       const sanitizedService = sanitizeInput(formData.serviceInterest);
 
-      // Format message for WhatsApp
-      const message = `📧 CONTACT INQUIRY
+      const res = await fetch(
+        "https://pdhrnnyjdipfhdrjihkq.supabase.co/functions/v1/send-email",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            type: "contact",
+            firstName: sanitizedFirstName,
+            lastName: sanitizedLastName,
+            email: sanitizedEmail,
+            serviceInterest: sanitizedService,
+            message: sanitizedMessage,
+          }),
+        }
+      );
 
-Name: ${sanitizedFirstName} ${sanitizedLastName}
-Email: ${sanitizedEmail}
-Service Interest: ${sanitizedService}
+      if (!res.ok) throw new Error("Failed to send");
 
-Message:
-${sanitizedMessage}`;
-
-      // Encode message
-      const encodedMessage = encodeURIComponent(message);
-
-      // Get WhatsApp phone from environment variable
-      const whatsappPhone =
-        import.meta.env.VITE_WHATSAPP_PHONE || "94701400093";
-
-      // Open WhatsApp
-      const whatsappURL = `https://wa.me/${whatsappPhone}?text=${encodedMessage}`;
-      window.open(whatsappURL, "_blank");
-
-      // Reset form
       setFormData({
         firstName: "",
         lastName: "",
@@ -93,10 +87,7 @@ ${sanitizedMessage}`;
         message: "",
       });
 
-      // Show success modal
-      setSuccessMessage(
-        "Message sent via WhatsApp! Our team will get back to you soon.",
-      );
+      setSuccessMessage("Message sent! Our team will get back to you soon.");
       setShowSuccessModal(true);
     } catch (error) {
       alert("Error sending message. Please try again.");
@@ -121,7 +112,6 @@ ${sanitizedMessage}`;
         <Navbar />
 
         <div className={styles.container}>
-          {/* Main Contact Section */}
           <ScrollReveal direction="up" delay={0.2}>
             <section className={styles.contactSection}>
               {/* Left Side - Hero Content + Contact Information */}
@@ -150,15 +140,76 @@ ${sanitizedMessage}`;
 
                   {/* Contact Information */}
                   <div className={styles.contactInfo}>
+
+                    {/* ── Japan Office ── */}
                     <ScrollReveal direction="up" delay={1.0}>
+                      <p className={styles.officeLabel}>Japan Office</p>
+                    </ScrollReveal>
+
+                    <ScrollReveal direction="up" delay={1.1}>
                       <div className={styles.infoItem}>
                         <div className={styles.infoIcon}>
-                          <svg
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                          >
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                            <circle cx="12" cy="10" r="3"></circle>
+                          </svg>
+                        </div>
+                        <div className={styles.infoContent}>
+                          <h4>ADDRESS</h4>
+                          <p>
+                            〒672-8079, Hyogo Prefecture, Himeji City,<br />
+                            Shikama Ward, Imazaike 1405-1<br />
+                            Casa Nishishikama 203, JAPAN<br />
+                            220-10 Daijuji, Kamioka-cho, Tatsuno City
+                          </p>
+                        </div>
+                      </div>
+                    </ScrollReveal>
+
+                    <ScrollReveal direction="up" delay={1.2}>
+                      <div className={styles.infoItem}>
+                        <div className={styles.infoIcon}>
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                          </svg>
+                        </div>
+                        <div className={styles.infoContent}>
+                          <h4>PHONE & FAX</h4>
+                          <p>
+                            Tel: +81 79 280 7650<br />
+                            Fax: +81 79 280 7651<br />
+                            Hotline: +81 70-8507-1077<br />
+                            +94 77-273 33149<br />
+                            +81 70-1748 8956
+                          </p>
+                        </div>
+                      </div>
+                    </ScrollReveal>
+
+                    <ScrollReveal direction="up" delay={1.3}>
+                      <div className={styles.infoItem}>
+                        <div className={styles.infoIcon}>
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+                            <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
+                          </svg>
+                        </div>
+                        <div className={styles.infoContent}>
+                          <h4>EMAIL</h4>
+                          <p>honshuenterprisescoltd@gmail.com</p>
+                        </div>
+                      </div>
+                    </ScrollReveal>
+
+                    {/* ── Sri Lanka Office ── */}
+                    <ScrollReveal direction="up" delay={1.4}>
+                      <p className={`${styles.officeLabel} ${styles.officeLabelGap}`}>Sri Lanka Office</p>
+                    </ScrollReveal>
+
+                    <ScrollReveal direction="up" delay={1.5}>
+                      <div className={styles.infoItem}>
+                        <div className={styles.infoIcon}>
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                             <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
                             <circle cx="12" cy="10" r="3"></circle>
                           </svg>
@@ -170,42 +221,30 @@ ${sanitizedMessage}`;
                       </div>
                     </ScrollReveal>
 
-                    <ScrollReveal direction="up" delay={1.2}>
+                    <ScrollReveal direction="up" delay={1.6}>
                       <div className={styles.infoItem}>
                         <div className={styles.infoIcon}>
-                          <svg
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                          >
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                             <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
                           </svg>
                         </div>
                         <div className={styles.infoContent}>
-                          <h4>PHONE</h4>
+                          <h4>PHONE & FAX</h4>
                           <p>
-                            +94 37 22 24 717
-                            <br />
-                            +94 37 46 90 349
-                            <br />
-                            +94 37 22 22 777
-                            <br />
-                            +94 37 22 22 154
+                            +94 37 22 24 717<br />
+                            +94 37 46 90 349<br />
+                            +94 37 22 22 777<br />
+                            +94 37 22 22 154<br />
+                            Fax: +94 37 22 25 314
                           </p>
                         </div>
                       </div>
                     </ScrollReveal>
 
-                    <ScrollReveal direction="up" delay={1.4}>
+                    <ScrollReveal direction="up" delay={1.7}>
                       <div className={styles.infoItem}>
                         <div className={styles.infoIcon}>
-                          <svg
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                          >
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                             <rect x="2" y="4" width="20" height="16" rx="2"></rect>
                             <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
                           </svg>
@@ -213,40 +252,13 @@ ${sanitizedMessage}`;
                         <div className={styles.infoContent}>
                           <h4>EMAIL</h4>
                           <p>
-                            honshu7@sltnet.lk
-                            <br />
+                            honshu7@sltnet.lk<br />
                             honshu7@yahoo.com
                           </p>
                         </div>
                       </div>
                     </ScrollReveal>
 
-                    <ScrollReveal direction="up" delay={1.6}>
-                      <div className={styles.infoItem}>
-                        <div className={styles.infoIcon}>
-                          <svg
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                          >
-                            <polyline points="23 7 16 12 23 17 23 7"></polyline>
-                            <rect
-                              x="1"
-                              y="5"
-                              width="15"
-                              height="14"
-                              rx="2"
-                              ry="2"
-                            ></rect>
-                          </svg>
-                        </div>
-                        <div className={styles.infoContent}>
-                          <h4>FAX</h4>
-                          <p>+94 37 22 25 314</p>
-                        </div>
-                      </div>
-                    </ScrollReveal>
                   </div>
                 </div>
               </ScrollReveal>

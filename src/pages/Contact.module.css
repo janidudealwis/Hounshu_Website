@@ -205,6 +205,22 @@
   line-height: 1.65;
 }
 
+.officeLabel {
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: #4ade80;
+  margin: 12px 0 -4px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(74, 222, 128, 0.2);
+  text-shadow: 0 0 20px rgba(74, 222, 128, 0.4);
+}
+
+.officeLabelGap {
+  margin-top: 48px;
+}
+
 /* ─── Contact form ───────────────────────────────── */
 
 .contactForm {
